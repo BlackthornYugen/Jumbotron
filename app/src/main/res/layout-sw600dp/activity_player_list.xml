@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp" android:baselineAligned="false"
+    android:divider="?android:attr/dividerHorizontal" android:orientation="horizontal"
+    android:showDividers="middle" tools:context=".PlayerListActivity">
+
+    <!--
+    This layout is a two-pane layout for the Players
+    master/detail flow.
+    
+    -->
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipe_container"
+        android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
+        <fragment android:id="@+id/player_list"
+            android:name="com.steelcomputers.android.assignmenttwo.PlayerListFragment"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            tools:layout="@android:layout/list_content" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <FrameLayout android:id="@+id/player_detail_container" android:layout_width="0dp"
+        android:layout_height="match_parent" android:layout_weight="3" />
+
+</LinearLayout>

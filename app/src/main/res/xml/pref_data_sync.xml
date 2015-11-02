@@ -1,0 +1,9 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:key="cloud_sync"
+        android:title="Sync to Cloud"
+        android:summary="Synchronize your players and scores to the internet."
+        android:defaultValue="false" />
+
+</PreferenceScreen>

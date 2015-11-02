@@ -1,0 +1,46 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView style="@style/TextAppearance.AppCompat.Large.Label"
+            android:text="@string/name" />
+        <TextView style="@style/TextAppearance.AppCompat.Large.Value"
+            android:id="@+id/player_name"
+            android:text="@string/unknown" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView style="@style/TextAppearance.AppCompat.Large.Label"
+            android:text="@string/wins" />
+        <TextView style="@style/TextAppearance.AppCompat.Large.Value"
+            android:id="@+id/player_wins"
+            android:text="0" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView style="@style/TextAppearance.AppCompat.Large.Label"
+            android:text="@string/losses" />
+        <TextView style="@style/TextAppearance.AppCompat.Large.Value"
+            android:id="@+id/player_losses"
+            android:text="0" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView style="@style/TextAppearance.AppCompat.Large.Label"
+            android:text="@string/ties" />
+        <TextView style="@style/TextAppearance.AppCompat.Large.Value"
+            android:id="@+id/player_ties"
+            android:text="0" />
+    </LinearLayout>
+
+    <!--<LinearLayout android:id="@+id/undobar" style="@style/UndoBar">-->
+        <!--<TextView android:id="@+id/undobar_message" style="@style/UndoBarMessage" />-->
+        <!--<Button android:id="@+id/undobar_button" style="@style/UndoBarButton" />-->
+    <!--</LinearLayout>-->
+</LinearLayout>
