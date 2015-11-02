@@ -6,4 +6,10 @@
         android:summary="Synchronize your players and scores to the internet."
         android:defaultValue="false" />
 
+    <SwitchPreference
+        android:key="cloud_keep_local"
+        android:title="Keep local players"
+        android:summary="Don't delete local data if it no longer exists online."
+        android:defaultValue="false" />
+
 </PreferenceScreen>

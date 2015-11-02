@@ -1,11 +1,19 @@
 package com.steelcomputers.android.assignmenttwo;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.parse.FindCallback;
@@ -13,6 +21,7 @@ import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -99,8 +108,9 @@ public class Player extends ParseObject implements java.io.Serializable {
     public static void queryPlayers() {
         mIsQueryRunning = true;
         boolean useNetwork = false;
+        SharedPreferences preferences = Preferences.getSharedPreferences();
         try {
-            useNetwork = Preferences.getSharedPreferences().getBoolean("cloud_sync", useNetwork);
+            useNetwork = preferences.getBoolean("cloud_sync", useNetwork);
         } catch (Exception e) {
             Log.e("Player", "Couldn't load sync preference.", e);
         }
@@ -110,6 +120,7 @@ public class Player extends ParseObject implements java.io.Serializable {
     public static void queryPlayers(final boolean useNetwork) {
         mIsQueryRunning = true;
         final ParseQuery<Player> query = ParseQuery.getQuery("Player");
+        final SharedPreferences preferences = Preferences.getSharedPreferences();
         query.orderByAscending(COLUMN.NAME);
         if (!useNetwork) {
             query.fromLocalDatastore();
@@ -120,7 +131,10 @@ public class Player extends ParseObject implements java.io.Serializable {
                     try {
                         if (parseException == null) {
                             if(useNetwork) {
-                                ParseObject.pinAllInBackground(playerList); // Pin objects from net
+                                if(!preferences.getBoolean("cloud_keep_local", false)) {
+                                    ParseObject.unpinAll(getPlayers()); // Remove old players
+                                }
+                                ParseObject.pinAllInBackground(playerList); // Pin players from net
                             }
                             setPlayers(playerList);
                             notifyListeners();
@@ -190,6 +204,123 @@ public class Player extends ParseObject implements java.io.Serializable {
             }
 
             return v;
+        }
+    }
+
+    @NonNull
+    public static AlertDialog.Builder getNewPlayerDialog(Activity context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Enter Player Name");
+        setDialogButtons(builder, context, new Player(), "Add Player", "Cancel");
+        return builder;
+    }
+
+    @NonNull
+    public static AlertDialog.Builder getRenamePlayerDialog (Activity context, Player player){
+        return player.getRenamePlayerDialog(context);
+    }
+
+    @NonNull
+    public AlertDialog.Builder getRenamePlayerDialog(Activity context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(String.format("Rename \"%s\"", getName()));
+        setDialogButtons(builder, context, this, "Rename", "Don't rename");
+        return builder;
+    }
+
+    private static void setDialogButtons(AlertDialog.Builder builder, Activity context,
+                                         final Player player, String positive, String negative) {
+        // Create the input view
+        final EditText input = new EditText(context);
+        if (player.getName() != null) {
+            input.setText(player.getName());
+            input.selectAll();
+        }
+
+        // Rename the enter key on the android keyboard
+        input.setImeActionLabel(positive, android.view.KeyEvent.KEYCODE_ENTER);
+
+        // Auto-capitalize first/last names
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+        // Set the builder view to our input view
+        builder.setView(input);
+
+        // When keyboard KEYCODE_ENTER is activated
+        builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                Log.d(this.getClass().getName(), Integer.toBinaryString(keyCode));
+                if (keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+                    try {
+                        player.setName(input.getText().toString().trim());
+                        player.saveChanges();
+                        dialog.dismiss();
+                    } catch (Exception e) {
+                        Log.e(this.getClass().getName(), "Couldn't save player.", e);
+                    }
+                    return false;
+                }
+                return true;
+            }
+        });
+
+        // When positive button is activated
+        builder.setPositiveButton(positive, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    player.setName(input.getText().toString().trim());
+                    player.saveChanges();
+                } catch (Exception e) {
+                    Log.e(this.getClass().getName(), "Couldn't save player.", e);
+                }
+            }
+        });
+
+        // When negative button is activated
+        builder.setNegativeButton(negative, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+    }
+
+    @NonNull
+    public static AlertDialog.Builder getPlayersDialog(Activity context) throws Exception {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        throw new Exception("Not implemented");
+    }
+
+    private void saveChanges() {
+        try {
+            this.pinInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException parseException) {
+                    try {
+                        if (parseException == null) {
+                            Player.queryPlayers(false); // Update players
+                        } else {
+                            throw parseException;
+                        }
+                    } catch (ParseException e) {
+                        Log.e(this.getClass().getName(), "Cannot save locally", e);
+                    }
+                }
+            });
+            if (Preferences.getSharedPreferences().getBoolean("cloud_sync", false)) {
+                this.saveEventually(new SaveCallback() {
+                    @Override
+                    public void done(ParseException parseException) {
+                        if (parseException != null) {
+                            Log.e(this.getClass().getName(), "Cannot save remotely.", parseException);
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.e(this.getClass().getName(), "Couldn't create player.", e);
         }
     }
 }

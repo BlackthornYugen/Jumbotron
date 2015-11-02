@@ -1,17 +1,25 @@
 package com.steelcomputers.android.assignmenttwo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
+
+import com.parse.ParseException;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -43,6 +51,7 @@ public class PlayerListActivity extends AppCompatActivity
      */
     private boolean mTwoPane;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private String mSelection;
 
     @Override
     public void onRefresh() {
@@ -87,9 +96,7 @@ public class PlayerListActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(context, SettingsActivity.class));
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Player.getNewPlayerDialog(context).show();
             }
         });
 
@@ -97,7 +104,7 @@ public class PlayerListActivity extends AppCompatActivity
             mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
             mSwipeRefreshLayout.setOnRefreshListener(this);
         } catch (Exception e) {
-            Log.e("PlayerListFragment", "Can't set refresh listener", e);
+            Log.e(this.getClass().getName(), "Can't set refresh listener", e);
         }
 
         if (findViewById(R.id.player_detail_container) != null) {
@@ -121,24 +128,33 @@ public class PlayerListActivity extends AppCompatActivity
      */
     @Override
     public void onItemSelected(String id) {
-        if (mTwoPane) {
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putInt(PlayerDetailFragment.ARG_ITEM_ID, Integer.parseInt(id));
-            PlayerDetailFragment fragment = new PlayerDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.player_detail_container, fragment)
-                    .commit();
+        int playerId = Integer.parseInt(id);
 
+        if (id.equals(mSelection)) {
+            // Rename player if selected twice
+            Player player = Player.getPlayers().get(playerId);
+            Player.getRenamePlayerDialog(this, player).show();
         } else {
-            // In single-pane mode, simply start the detail activity
-            // for the selected item ID.
-            Intent detailIntent = new Intent(this, PlayerDetailActivity.class);
-            detailIntent.putExtra(PlayerDetailFragment.ARG_ITEM_ID, id);
-            startActivity(detailIntent);
+            if (mTwoPane) {
+                // In two-pane mode, show the detail view in this activity by
+                // adding or replacing the detail fragment using a
+                // fragment transaction.
+                Bundle arguments = new Bundle();
+                arguments.putInt(PlayerDetailFragment.ARG_ITEM_ID, playerId);
+                PlayerDetailFragment fragment = new PlayerDetailFragment();
+                fragment.setArguments(arguments);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.player_detail_container, fragment)
+                        .commit();
+
+            } else {
+                // In single-pane mode, simply start the detail activity
+                // for the selected item ID.
+                Intent detailIntent = new Intent(this, PlayerDetailActivity.class);
+                detailIntent.putExtra(PlayerDetailFragment.ARG_ITEM_ID, id);
+                startActivity(detailIntent);
+            }
+            mSelection = id;
         }
     }
 }
