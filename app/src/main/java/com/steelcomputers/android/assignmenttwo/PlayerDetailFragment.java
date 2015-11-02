@@ -28,6 +28,7 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
+    public static final String ARG_STATE_SAVED = "state_saved";
 
     /**
      * The dummy content this fragment is presenting.
@@ -52,14 +53,18 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
+        if ( savedInstanceState != null && savedInstanceState.getBoolean(ARG_STATE_SAVED)) {
+            mPlayer = (Player) savedInstanceState.getSerializable(ARG_ITEM_ID);
+        } else if (getArguments().containsKey(ARG_ITEM_ID)) {
             mPlayer = Player.getPlayers().get(getArguments().getInt(ARG_ITEM_ID));
-            Activity activity = this.getActivity();
-            mAppBar = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            if (mAppBar != null) {
-                mAppBar.setTitle(mPlayer.getName());
-            }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(ARG_STATE_SAVED, true);
+        outState.putSerializable(ARG_ITEM_ID, mPlayer);
     }
 
     @Override
@@ -67,6 +72,7 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_player_detail, container, false);
 
+        mAppBar = (CollapsingToolbarLayout) getActivity().findViewById(R.id.toolbar_layout);
         mWins = (TextView) rootView.findViewById(R.id.player_wins);
         mLosses = (TextView) rootView.findViewById(R.id.player_losses);
         mTies = (TextView) rootView.findViewById(R.id.player_ties);
@@ -114,28 +120,32 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
     }
 
     private void setViewValues() {
-        if (mPlayer != null) {
-            if (Player.getPlayers().contains(mPlayer)) {
-                if (mAppBar != null) {
-                    mAppBar.setTitle(mPlayer.getName());
+        try {
+            if (mPlayer != null) {
+                if (Player.getPlayers().contains(mPlayer)) {
+                    if (mAppBar != null) {
+                        mAppBar.setTitle(mPlayer.getName());
+                    }
+
+                    mWins.setText(Integer.toString(mPlayer.getWins()));
+                    mLosses.setText(Integer.toString(mPlayer.getLosses()));
+                    mTies.setText(Integer.toString(mPlayer.getTies()));
+                } else {
+                    if (mAppBar != null) {
+                        mAppBar.setTitle("(Deleted) " + mPlayer.getName());
+                    }
+
+                    mWins.setText("-");
+                    mLosses.setText("-");
+                    mTies.setText("-");
+
+                    mBtnRename.setEnabled(false);
+                    mBtnDelete.setEnabled(false);
+                    mBtnChallange.setEnabled(false);
                 }
-
-                mWins.setText(Integer.toString(mPlayer.getWins()));
-                mLosses.setText(Integer.toString(mPlayer.getLosses()));
-                mTies.setText(Integer.toString(mPlayer.getTies()));
-            } else {
-                if (mAppBar != null) {
-                    mAppBar.setTitle(mPlayer.getName() + " (Deleted)");
-                }
-
-                mWins.setText("-");
-                mLosses.setText("-");
-                mTies.setText("-");
-
-                mBtnRename.setEnabled(false);
-                mBtnDelete.setEnabled(false);
-                mBtnChallange.setEnabled(false);
             }
+        } catch (Exception e) {
+            android.util.Log.e(getClass().getName(), "Failed to set fragment values", e);
         }
     }
 
