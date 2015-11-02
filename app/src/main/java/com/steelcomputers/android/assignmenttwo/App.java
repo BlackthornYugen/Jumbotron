@@ -24,7 +24,7 @@ public class App extends Application {
         }
 
         try {
-            Player.queryPlayers(false);
+            Player.queryPlayers(false); // Load offline copy
             Log.i("App", "Loaded players from localdb");
         } catch (Exception e) {
             Log.e("App", "Failed to get players from localdb.", e);

@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
@@ -177,6 +178,11 @@ public class Player extends ParseObject implements java.io.Serializable {
         private int mResource = android.R.layout.simple_list_item_activated_1;
         private int mTextViewResourceId = android.R.id.text1;
 
+        public ListAdapter(Context context, int resource, List<Player> objects) {
+            super(context, resource, objects);
+            mResource = resource;
+        }
+
         public ListAdapter(Context context, int resource, int textViewResourceId, List<Player> objects) {
             super(context, resource, textViewResourceId, objects);
             mResource = resource;
@@ -208,28 +214,47 @@ public class Player extends ParseObject implements java.io.Serializable {
     }
 
     @NonNull
-    public static AlertDialog.Builder getNewPlayerDialog(Activity context) {
+    public AlertDialog.Builder getDeletePlayerDialog(Activity context) {
+        final Player player = this;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Enter Player Name");
-        setDialogButtons(builder, context, new Player(), "Add Player", "Cancel");
+        builder.setTitle(String.format(context.getString(R.string.playerDeleteConfirmation), getName()));
+        builder.setPositiveButton(R.string.deletePlayer, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                player.doDelete();
+            }
+        });
+        builder.setNegativeButton(R.string.cancelDelete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
         return builder;
     }
 
     @NonNull
-    public static AlertDialog.Builder getRenamePlayerDialog (Activity context, Player player){
-        return player.getRenamePlayerDialog(context);
+    public static AlertDialog.Builder getNewPlayerDialog(Activity context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Enter Player Name");
+        setCreateOrRenameDialogButtons(builder, context, new Player(), "Add Player", "Cancel");
+        return builder;
     }
 
     @NonNull
     public AlertDialog.Builder getRenamePlayerDialog(Activity context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(String.format("Rename \"%s\"", getName()));
-        setDialogButtons(builder, context, this, "Rename", "Don't rename");
+        setCreateOrRenameDialogButtons(builder, context, this, "Rename", "Don't rename");
         return builder;
     }
 
-    private static void setDialogButtons(AlertDialog.Builder builder, Activity context,
-                                         final Player player, String positive, String negative) {
+    private static void setCreateOrRenameDialogButtons(AlertDialog.Builder builder,
+                                                       Activity context,
+                                                       final Player player,
+                                                       String positive,
+                                                       String negative) {
         // Create the input view
         final EditText input = new EditText(context);
         if (player.getName() != null) {
@@ -254,7 +279,7 @@ public class Player extends ParseObject implements java.io.Serializable {
                 if (keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
                     try {
                         player.setName(input.getText().toString().trim());
-                        player.saveChanges();
+                        player.doSave();
                         dialog.dismiss();
                     } catch (Exception e) {
                         Log.e(this.getClass().getName(), "Couldn't save player.", e);
@@ -271,7 +296,7 @@ public class Player extends ParseObject implements java.io.Serializable {
             public void onClick(DialogInterface dialog, int which) {
                 try {
                     player.setName(input.getText().toString().trim());
-                    player.saveChanges();
+                    player.doSave();
                 } catch (Exception e) {
                     Log.e(this.getClass().getName(), "Couldn't save player.", e);
                 }
@@ -288,12 +313,22 @@ public class Player extends ParseObject implements java.io.Serializable {
     }
 
     @NonNull
-    public static AlertDialog.Builder getPlayersDialog(Activity context) throws Exception {
+    public AlertDialog.Builder getPlayersDialog(Activity context,
+                                                       DialogInterface.OnClickListener listener,
+                                                       List<Player> players) {
+        if (players == null) {
+            players = getPlayers();
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        throw new Exception("Not implemented");
+        ListAdapter listAdapter = new ListAdapter(context,
+                android.R.layout.simple_list_item_activated_1, players);
+        builder.setAdapter(listAdapter, listener);
+        builder.setTitle("Select an opponent");
+        return builder;
     }
 
-    private void saveChanges() {
+    private void doSave() {
         try {
             this.pinInBackground(new SaveCallback() {
                 @Override
@@ -313,14 +348,42 @@ public class Player extends ParseObject implements java.io.Serializable {
                 this.saveEventually(new SaveCallback() {
                     @Override
                     public void done(ParseException parseException) {
-                        if (parseException != null) {
-                            Log.e(this.getClass().getName(), "Cannot save remotely.", parseException);
-                        }
+                    if (parseException != null) {
+                        Log.e(this.getClass().getName(), "Cannot save remotely.", parseException);
+                    }
                     }
                 });
             }
         } catch (Exception e) {
             Log.e(this.getClass().getName(), "Couldn't create player.", e);
+        }
+    }
+
+    private void doDelete() {
+        unpinInBackground(new DeleteCallback() {
+            @Override
+            public void done(ParseException parseException) {
+                try {
+                    if (parseException == null) {
+                        Player.queryPlayers(false); // Update players
+                    } else {
+                        throw parseException;
+                    }
+                } catch (ParseException e) {
+                    Log.e("Player", "Player could not be deleted locally", e);
+                }
+            }
+        });
+
+        if (Preferences.getSharedPreferences().getBoolean("cloud_sync", false)) {
+            deleteEventually(new DeleteCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null) {
+                        Log.e("Player", "Player could not be deleted remotely", e);
+                    }
+                }
+            });
         }
     }
 }

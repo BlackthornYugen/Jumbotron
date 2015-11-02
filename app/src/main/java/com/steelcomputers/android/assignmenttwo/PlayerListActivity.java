@@ -130,12 +130,11 @@ public class PlayerListActivity extends AppCompatActivity
     public void onItemSelected(String id) {
         int playerId = Integer.parseInt(id);
 
-        if (id.equals(mSelection)) {
-            // Rename player if selected twice
-            Player player = Player.getPlayers().get(playerId);
-            Player.getRenamePlayerDialog(this, player).show();
-        } else {
-            if (mTwoPane) {
+        if (mTwoPane) {
+            if (id.equals(mSelection)) {
+                // Rename player if selected twice in two-pane mode
+                Player.getPlayers().get(playerId).getRenamePlayerDialog(this).show();
+            } else {
                 // In two-pane mode, show the detail view in this activity by
                 // adding or replacing the detail fragment using a
                 // fragment transaction.
@@ -146,15 +145,14 @@ public class PlayerListActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.player_detail_container, fragment)
                         .commit();
-
-            } else {
-                // In single-pane mode, simply start the detail activity
-                // for the selected item ID.
-                Intent detailIntent = new Intent(this, PlayerDetailActivity.class);
-                detailIntent.putExtra(PlayerDetailFragment.ARG_ITEM_ID, id);
-                startActivity(detailIntent);
             }
-            mSelection = id;
+        } else {
+            // In single-pane mode, simply start the detail activity
+            // for the selected item ID.
+            Intent detailIntent = new Intent(this, PlayerDetailActivity.class);
+            detailIntent.putExtra(PlayerDetailFragment.ARG_ITEM_ID, playerId);
+            startActivity(detailIntent);
         }
+        mSelection = id;
     }
 }
