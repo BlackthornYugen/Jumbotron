@@ -1,3 +1,13 @@
+/**
+ * build.gradle
+ *
+ * Our build file, it has been modified to look for two environment variables
+ * containing the Parse Client Key & App ID that are set in the global
+ * gradle.properties file.
+ *
+ * Created by John Steel on 2015-10-31.
+ */
+
 apply plugin: 'com.android.application'
 def PARSE_APPLICATION_ID = '"' + ParseAppId + '"' ?: '"Define Parse Application ID"';
 def PARSE_CLIENT_KEY = '"' + ParseClientKey + '"' ?: '"Define Parse Client Key"';

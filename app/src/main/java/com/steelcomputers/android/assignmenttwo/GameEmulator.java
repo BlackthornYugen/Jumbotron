@@ -9,6 +9,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+/**
+ * GameEmulator.java
+ *
+ * Allow our users to update Wins, Ties & Losses via {@link GameEmulatorFragment}
+ *
+ * Created by John Steel on 2015-11-02 from a template.
+ */
 public class GameEmulator extends AppCompatActivity {
 
     @Override

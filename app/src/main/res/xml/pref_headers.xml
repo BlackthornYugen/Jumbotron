@@ -1,3 +1,10 @@
+<!--
+pref_headers.xml
+
+The headers page for settings, currently the only subpage is data & sync.
+
+Created by John Steel on 2015-11-01 from a template.
+-->
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- These settings headers are only used on tablets. -->

@@ -10,6 +10,8 @@ import android.widget.ListView;
 import java.util.List;
 
 /**
+ * PlayerDetailFragment.java
+ *
  * A list fragment representing a list of Players. This fragment
  * also supports tablet devices by allowing list items to be given an
  * 'activated' state upon selection. This helps indicate which item is
@@ -17,6 +19,8 @@ import java.util.List;
  * <p/>
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
+ *
+ * Created by John Steel on 2015-10-31 from a template.
  */
 public class PlayerListFragment extends ListFragment implements Player.PlayerListener {
 
@@ -55,14 +59,14 @@ public class PlayerListFragment extends ListFragment implements Player.PlayerLis
         /**
          * Callback for when an item has been selected.
          */
-        public void onPlayerSelected(String id);
+        void onPlayerSelected(String id);
     }
 
     /**
      * A dummy implementation of the {@link Callbacks} interface that does
      * nothing. Used only when this fragment is not attached to an activity.
      */
-    private static Callbacks sDummyCallbacks = new Callbacks() {
+    private static final Callbacks sDummyCallbacks = new Callbacks() {
         @Override
         public void onPlayerSelected(String id) {
         }

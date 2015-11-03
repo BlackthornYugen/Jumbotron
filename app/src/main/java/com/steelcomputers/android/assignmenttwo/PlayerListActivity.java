@@ -18,6 +18,8 @@ import java.util.List;
 
 
 /**
+ * PlayerListActivity.java
+ *
  * An activity representing a list of Players. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
@@ -32,6 +34,8 @@ import java.util.List;
  * This activity also implements the required
  * {@link PlayerListFragment.Callbacks} interface
  * to listen for item selections.
+ *
+ * Created by John Steel on 2015-10-31 from a template.
  */
 public class PlayerListActivity extends AppCompatActivity
         implements PlayerListFragment.Callbacks, PlayerDetailFragment.Callbacks,

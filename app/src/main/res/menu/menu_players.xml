@@ -1,3 +1,10 @@
+<!--
+menu_players.xml
+
+This layout describes the app bar buttons available from the player list and player detail activities.
+
+Created by John Steel on 2015-11-02 from a template.
+-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">

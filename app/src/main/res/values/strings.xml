@@ -1,3 +1,10 @@
+<!--
+strings.xml
+
+The strings here are used all over the Score Tracker application.
+
+Created by John Steel on 2015-10-31.
+-->
 <resources>
     <string name="app_name">Score Tracker 9000</string>
     <string name="title_activity_settings">Score Tracker 9000 Settings</string>

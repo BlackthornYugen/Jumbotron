@@ -1,18 +1,18 @@
 package com.steelcomputers.android.assignmenttwo;
 
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-
-import java.io.Serializable;
 
 /**
+ * GameEmulatorFragment.java
+ *
  * A placeholder fragment containing a simple view.
+ *
+ * Created by John Steel on 2015-11-02 from a template.
  */
 public class GameEmulatorFragment extends Fragment {
 
@@ -21,8 +21,6 @@ public class GameEmulatorFragment extends Fragment {
     public static final String ARG_STATE_SAVED = "state_saved";
     private Player mPlayerOne;
     private Player mPlayerTwo;
-    private CollapsingToolbarLayout mAppBar;
-    private Button mBtnDraw;
     private Button mBtnWinnerPlayerTwo;
     private Button mBtnWinnerPlayerOne;
 
@@ -51,11 +49,9 @@ public class GameEmulatorFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_game_emulator, container, false);
 
-
-        mAppBar = (CollapsingToolbarLayout) getActivity().findViewById(R.id.toolbar_layout);
         mBtnWinnerPlayerOne = ((Button) rootView.findViewById(R.id.player_one_wins));
         mBtnWinnerPlayerTwo = ((Button) rootView.findViewById(R.id.player_two_wins));
-        mBtnDraw = ((Button) rootView.findViewById(R.id.draw));
+        Button mBtnDraw = ((Button) rootView.findViewById(R.id.draw));
 
         mBtnWinnerPlayerOne.setOnClickListener(new View.OnClickListener() {
             @Override

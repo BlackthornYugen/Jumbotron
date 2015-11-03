@@ -29,7 +29,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by black_000 on 2015-10-26.
+ * Player.java
+ *
+ * Extends {@link ParseObject} to facilitate local and remote storage. Dialog
+ * factories have been made to make renaming, deleting and creating players as
+ * easy as possible to do without having knowledge of Parse's library.
+ *
+ * Created by John Steel on 2015-10-26.
  */
 @ParseClassName("Player")
 public class Player extends ParseObject implements java.io.Serializable {
@@ -72,20 +78,24 @@ public class Player extends ParseObject implements java.io.Serializable {
         }
         return mPlayers;
     }
-    public static boolean addListener(PlayerListener listener) {
+    public static void addListener(PlayerListener listener) {
         if (mListeners == null) {
             mListeners = new LinkedList<PlayerListener>();
         }
-        return mListeners.add(listener);
+        mListeners.add(listener);
     }
-    public static boolean removeListener(PlayerListener listener) {
+    public static void removeListener(PlayerListener listener) {
         if (mListeners == null) {
             mListeners = new LinkedList<PlayerListener>();
         }
-        return mListeners.remove(listener);
+        mListeners.remove(listener);
     }
-    public static void setPlayers(List players) {
-        mPlayers = players;
+    public static void setPlayers(List<Player> players) {
+        try {
+            mPlayers = players;
+        } catch (Exception e) {
+            Log.e(Player.class.getName(),"Unable to set players list", e);
+        }
     }
     public static boolean isRunningAQuery() {
         return mIsQueryRunning;
@@ -126,7 +136,7 @@ public class Player extends ParseObject implements java.io.Serializable {
         boolean useNetwork = false;
         SharedPreferences preferences = Preferences.getSharedPreferences();
         try {
-            useNetwork = preferences.getBoolean("cloud_sync", useNetwork);
+            useNetwork = preferences.getBoolean("cloud_sync", false);
         } catch (Exception e) {
             Log.e("Player", "Couldn't load sync preference.", e);
         }

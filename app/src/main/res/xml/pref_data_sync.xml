@@ -1,3 +1,10 @@
+<!--
+pref_data_sync.xml
+
+The sync settings.
+
+Created by John Steel on 2015-11-01 from a template.
+-->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference

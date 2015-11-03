@@ -1,3 +1,10 @@
+<!--
+activity_player_detail.xml
+
+The layout for the player detail activity.
+
+Created by John Steel on 2015-10-31 from a template.
+-->
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"

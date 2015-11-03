@@ -1,6 +1,5 @@
 package com.steelcomputers.android.assignmenttwo;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -13,14 +12,17 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
+ * PlayerDetailFragment.java
+ *
  * A fragment representing a single Player detail screen.
  * This fragment is either contained in a {@link PlayerListActivity}
  * in two-pane mode (on tablets) or a {@link PlayerDetailActivity}
  * on handsets.
+ *
+ * Created by John Steel on 2015-10-31.
  */
 public class PlayerDetailFragment extends Fragment implements Player.PlayerListener {
     /**
@@ -41,7 +43,7 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
     private TextView mTies;
     private Button mBtnRename;
     private Button mBtnDelete;
-    private Button mBtnChallange;
+    private Button mBtnChallenge;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -79,7 +81,7 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
         mTies = (TextView) rootView.findViewById(R.id.player_ties);
         mBtnRename = ((Button) rootView.findViewById(R.id.player_rename));
         mBtnDelete = ((Button) rootView.findViewById(R.id.player_delete));
-        mBtnChallange = ((Button) rootView.findViewById(R.id.player_challenge));
+        mBtnChallenge = ((Button) rootView.findViewById(R.id.player_challenge));
 
         mBtnRename.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +97,7 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
             }
         });
 
-        mBtnChallange.setOnClickListener(new View.OnClickListener() {
+        mBtnChallenge.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final List<Player> players = new ArrayList<Player>();
@@ -142,7 +144,7 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
 
                     mBtnRename.setEnabled(false);
                     mBtnDelete.setEnabled(false);
-                    mBtnChallange.setEnabled(false);
+                    mBtnChallenge.setEnabled(false);
                 }
             }
         } catch (Exception e) {
@@ -179,14 +181,14 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
         /**
          * Callback for when an item has been selected.
          */
-        public void onStartMatch(Player playerOne, Player playerTwo);
+        void onStartMatch(Player playerOne, Player playerTwo);
     }
 
     /**
      * A dummy implementation of the {@link Callbacks} interface that does
      * nothing. Used only when this fragment is not attached to an activity.
      */
-    private static Callbacks sDummyCallbacks = new Callbacks() {
+    private static final Callbacks sDummyCallbacks = new Callbacks() {
         @Override
         public void onStartMatch(Player playerOne, Player playerTwo) {
         }

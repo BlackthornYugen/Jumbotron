@@ -7,7 +7,11 @@ import com.parse.Parse;
 import com.parse.ParseObject;
 
 /**
- * Created by black_000 on 2015-10-31.
+ * App.java
+ *
+ * Extends {@link Application} in order to initialize the parse library
+ *
+ * Created by John Steel on 2015-10-31.
  */
 public class App extends Application {
 
