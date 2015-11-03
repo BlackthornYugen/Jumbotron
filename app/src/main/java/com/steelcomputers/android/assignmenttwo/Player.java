@@ -38,6 +38,21 @@ public class Player extends ParseObject implements java.io.Serializable {
         // Empty Constructor
     }
 
+    public void addLoss() {
+        setLosses(getLosses() + 1);
+        doSave();
+    }
+
+    public void addWin() {
+        setWins(getWins() + 1);
+        doSave();
+    }
+
+    public void addTie() {
+        setTies(getTies() + 1);
+        doSave();
+    }
+
     public static class COLUMN {
         public static final String NAME   = "name";
         public static final String WINS   = "wins";

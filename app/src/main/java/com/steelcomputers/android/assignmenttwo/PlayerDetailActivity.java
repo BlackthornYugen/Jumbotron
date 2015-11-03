@@ -18,24 +18,17 @@ import android.view.MenuItem;
  * This activity is mostly just a 'shell' activity containing nothing
  * more than a {@link PlayerDetailFragment}.
  */
-public class PlayerDetailActivity extends AppCompatActivity {
+public class PlayerDetailActivity
+        extends AppCompatActivity
+        implements PlayerDetailFragment.Callbacks {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final PlayerDetailActivity context = this;
         setContentView(R.layout.activity_player_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.challange);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(context, SettingsActivity.class));
-                Snackbar.make(view, "Replace with challenge action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         // Show the Up button in the action bar.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -77,5 +70,18 @@ public class PlayerDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    /**
+     * Callback method from {@link PlayerDetailFragment.Callbacks}
+     * indicating that a match should start.
+     */
+    @Override
+    public void onStartMatch(Player playerOne, Player playerTwo) {
+        Intent gameEmulator = new Intent(this, GameEmulator.class);
+        gameEmulator.putExtra(GameEmulatorFragment.ARG_PLAYER_ONE, Player.getPlayers().indexOf(playerOne));
+        gameEmulator.putExtra(GameEmulatorFragment.ARG_PLAYER_TWO, Player.getPlayers().indexOf(playerTwo));
+        startActivity(gameEmulator);
     }
 }

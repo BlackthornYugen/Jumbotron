@@ -29,6 +29,7 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
      */
     public static final String ARG_ITEM_ID = "item_id";
     public static final String ARG_STATE_SAVED = "state_saved";
+    private Callbacks mCallbacks = sDummyCallbacks;
 
     /**
      * The dummy content this fragment is presenting.
@@ -97,13 +98,13 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
         mBtnChallange.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Player> players = new ArrayList<Player>();
+                final List<Player> players = new ArrayList<Player>();
                 players.addAll(Player.getPlayers()); // Can't use reference because I need to change it
                 players.remove(mPlayer);
                 mPlayer.getPlayersDialog(getActivity(), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        android.util.Log.d(getClass().getName(), String.format("Selected: %s", which));
+                        mCallbacks.onStartMatch(mPlayer, players.get(which));
                         dialog.dismiss();
                     }
                 }, players).show();
@@ -153,12 +154,20 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
     public void onAttach(Context context) {
         super.onAttach(context);
         Player.addListener(this);
+
+        // Activities containing this fragment must implement its callbacks.
+        if (!(getActivity() instanceof Callbacks)) {
+            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+        }
+
+        mCallbacks = (Callbacks) getActivity();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         Player.removeListener(this);
+        mCallbacks = sDummyCallbacks;
     }
 
     /**

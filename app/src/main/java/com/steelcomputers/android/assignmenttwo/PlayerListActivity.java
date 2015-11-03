@@ -31,7 +31,8 @@ import java.util.List;
  * to listen for item selections.
  */
 public class PlayerListActivity extends AppCompatActivity
-        implements PlayerListFragment.Callbacks, SwipeRefreshLayout.OnRefreshListener, Player.PlayerListener {
+        implements PlayerListFragment.Callbacks, PlayerDetailFragment.Callbacks,
+        SwipeRefreshLayout.OnRefreshListener, Player.PlayerListener {
 
     public static final int NETWORK_TIMEOUT_MILLIS = 5000;
 
@@ -144,5 +145,24 @@ public class PlayerListActivity extends AppCompatActivity
             startActivity(detailIntent);
         }
         mSelection = id;
+    }
+
+    /**
+     * Callback method from {@link PlayerDetailFragment.Callbacks}
+     * indicating that a match should start. Only called on two-pane
+     * layouts. {@link PlayerDetailActivity} handles it on one-pane
+     * layouts.
+     */
+    @Override
+    public void onStartMatch(Player playerOne, Player playerTwo) {
+        Bundle arguments = new Bundle();
+
+        arguments.putInt(GameEmulatorFragment.ARG_PLAYER_ONE, Player.getPlayers().indexOf(playerOne));
+        arguments.putInt(GameEmulatorFragment.ARG_PLAYER_TWO, Player.getPlayers().indexOf(playerTwo));
+        GameEmulatorFragment fragment = new GameEmulatorFragment();
+        fragment.setArguments(arguments);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.player_detail_container, fragment)
+                .commit();
     }
 }
