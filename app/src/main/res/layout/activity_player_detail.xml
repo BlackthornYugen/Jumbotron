@@ -35,7 +35,7 @@ Created by John Steel on 2015-10-31 from a template.
         android:layout_width="match_parent" android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <android.support.design.widget.FloatingActionButton android:id="@+id/challange"
+    <android.support.design.widget.FloatingActionButton android:id="@+id/challenge"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start" android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_menu_compass"

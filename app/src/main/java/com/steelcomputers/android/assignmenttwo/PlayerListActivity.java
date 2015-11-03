@@ -59,6 +59,8 @@ public class PlayerListActivity extends AppCompatActivity
         } else {
             Player.addListener(context);
             Player.queryPlayers();
+            boolean sync_data = Preferences.getSharedPreferences().getBoolean("cloud_sync", false);
+            Toast.makeText(this, sync_data ? R.string.refresh_remote : R.string.refresh_local, Toast.LENGTH_SHORT).show();
             new Handler().postDelayed(new Runnable() {
                 @Override public void run() {
                     if (mSwipeRefreshLayout.isRefreshing()) {
@@ -69,7 +71,6 @@ public class PlayerListActivity extends AppCompatActivity
                 }
             }, NETWORK_TIMEOUT_MILLIS);
         }
-
     }
 
     @Override
@@ -127,6 +128,9 @@ public class PlayerListActivity extends AppCompatActivity
             case R.id.action_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
+                return true;
+            case R.id.action_refresh:
+                onRefresh();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

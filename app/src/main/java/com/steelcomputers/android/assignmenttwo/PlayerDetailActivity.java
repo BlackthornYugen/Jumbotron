@@ -2,12 +2,14 @@ package com.steelcomputers.android.assignmenttwo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 /**
@@ -56,6 +58,15 @@ public class PlayerDetailActivity
             case R.id.action_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
+                return true;
+            case R.id.action_refresh:
+                if (Player.isRunningAQuery()) {
+                    Toast.makeText(this, R.string.player_refresh_running, Toast.LENGTH_SHORT).show();
+                } else {
+                    Player.queryPlayers();
+                    boolean sync_data = Preferences.getSharedPreferences().getBoolean("cloud_sync", false);
+                    Toast.makeText(this, sync_data ? R.string.refresh_remote : R.string.refresh_remote, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

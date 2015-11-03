@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 /**
  * GameEmulator.java
@@ -73,6 +74,15 @@ public class GameEmulator extends AppCompatActivity {
             case R.id.action_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
+                return true;
+            case R.id.action_refresh:
+                if (Player.isRunningAQuery()) {
+                    Toast.makeText(this, R.string.player_refresh_running, Toast.LENGTH_SHORT).show();
+                } else {
+                    Player.queryPlayers();
+                    boolean sync_data = Preferences.getSharedPreferences().getBoolean("data_sync", false);
+                    Toast.makeText(this, sync_data ? R.string.refresh_remote : R.string.refresh_remote, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

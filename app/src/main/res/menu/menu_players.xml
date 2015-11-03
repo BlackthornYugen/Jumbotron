@@ -8,6 +8,9 @@ Created by John Steel on 2015-11-02 from a template.
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+    <item android:id="@+id/action_refresh" android:title="@string/refresh"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:orderInCategory="0" app:showAsAction="ifRoom|withText" />
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+        android:orderInCategory="100" app:showAsAction="ifRoom|withText" />
 </menu>
