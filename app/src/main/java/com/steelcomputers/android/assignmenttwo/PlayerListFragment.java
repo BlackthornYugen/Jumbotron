@@ -2,9 +2,7 @@ package com.steelcomputers.android.assignmenttwo;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ListFragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -57,7 +55,7 @@ public class PlayerListFragment extends ListFragment implements Player.PlayerLis
         /**
          * Callback for when an item has been selected.
          */
-        public void onItemSelected(String id);
+        public void onPlayerSelected(String id);
     }
 
     /**
@@ -66,7 +64,7 @@ public class PlayerListFragment extends ListFragment implements Player.PlayerLis
      */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
-        public void onItemSelected(String id) {
+        public void onPlayerSelected(String id) {
         }
     };
 
@@ -126,7 +124,7 @@ public class PlayerListFragment extends ListFragment implements Player.PlayerLis
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
 
-        mCallbacks.onItemSelected(Integer.toString(position));
+        mCallbacks.onPlayerSelected(Integer.toString(position));
     }
 
     @Override

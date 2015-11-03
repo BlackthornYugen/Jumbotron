@@ -160,4 +160,26 @@ public class PlayerDetailFragment extends Fragment implements Player.PlayerListe
         super.onDetach();
         Player.removeListener(this);
     }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callbacks {
+        /**
+         * Callback for when an item has been selected.
+         */
+        public void onStartMatch(Player playerOne, Player playerTwo);
+    }
+
+    /**
+     * A dummy implementation of the {@link Callbacks} interface that does
+     * nothing. Used only when this fragment is not attached to an activity.
+     */
+    private static Callbacks sDummyCallbacks = new Callbacks() {
+        @Override
+        public void onStartMatch(Player playerOne, Player playerTwo) {
+        }
+    };
 }
