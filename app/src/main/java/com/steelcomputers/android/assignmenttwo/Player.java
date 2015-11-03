@@ -217,15 +217,15 @@ public class Player extends ParseObject implements java.io.Serializable {
     public AlertDialog.Builder getDeletePlayerDialog(Activity context) {
         final Player player = this;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(String.format(context.getString(R.string.playerDeleteConfirmation), getName()));
-        builder.setPositiveButton(R.string.deletePlayer, new DialogInterface.OnClickListener() {
+        builder.setTitle(String.format(context.getString(R.string.player_delete_confirmation), getName()));
+        builder.setPositiveButton(R.string.player_delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 player.doDelete();
             }
         });
-        builder.setNegativeButton(R.string.cancelDelete, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.cancel_delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();

@@ -1,25 +1,15 @@
 package com.steelcomputers.android.assignmenttwo;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
-
-import com.parse.ParseException;
-import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -57,7 +47,7 @@ public class PlayerListActivity extends AppCompatActivity
     public void onRefresh() {
         final PlayerListActivity context = this;
         if (Player.isRunningAQuery()) {
-            Toast.makeText(context, R.string.refreshRunning, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.player_refresh_running, Toast.LENGTH_SHORT).show();
         } else {
             Player.addListener(context);
             Player.queryPlayers();
