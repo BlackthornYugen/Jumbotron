@@ -9,8 +9,8 @@
  */
 
 apply plugin: 'com.android.application'
-def PARSE_APPLICATION_ID = '"' + ParseAppId + '"' ?: '"Define Parse Application ID"';
-def PARSE_CLIENT_KEY = '"' + ParseClientKey + '"' ?: '"Define Parse Client Key"';
+def PARSE_APPLICATION_ID = "pu2GR8mk2f8uY2o0grqnWjNJJDkAn75NFoas212O" ?: '"Define Parse Application ID"';
+def PARSE_CLIENT_KEY = "fluCFgTtkAxHQVW9Yp4Fv1pbpuG18bzPqilTqwEE" ?: '"Define Parse Client Key"';
 
 android {
     compileSdkVersion 23
