@@ -3,9 +3,9 @@ Jumbotron
 
 Jumbotron is (will be) a tool for tracking and displaying the scores of a game. Once
 tracked, scores will be stored on the device via sql lite and an option will be given
-to sync them to a remote server. I hope that a big feature of this application is the
-ability to display scores via Chromecast. Schools could then use projectors or TVs
-equiped with a Chromecast Dongle to have a low-buget Jumbotron. 
+to sync them to a remote server. A big feature of this application is the ability to 
+display scores via Chromecast. Schools could then use projectors or TVs equiped with a 
+Chromecast Dongle to have a low-buget Jumbotron. 
 
 ## Goals
  - Never require an active internet connection for core functionality
