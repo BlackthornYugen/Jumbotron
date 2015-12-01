@@ -33,4 +33,5 @@ Created by John Steel on 2015-10-31.
     <string name="refresh_local">Reloading data from device...</string>
     <string name="refresh_remote">Reloading data from the web...</string>
     <string name="title_activity_list_teams">ListTeams</string>
+    <string name="title_activity_team_detail">TeamDetailActivity</string>
 </resources>
