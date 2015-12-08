@@ -1,7 +1,7 @@
 <!--
 fragment_player_detail.xml
 
-The layout for the player detail fragment.
+The layout for the contestant detail fragment.
 
 Created by John Steel on 2015-10-31 from a template.
 -->
@@ -38,7 +38,7 @@ Created by John Steel on 2015-10-31 from a template.
     </LinearLayout>
     <Button
         android:id="@+id/player_rename"
-        android:text="Rename player"
+        android:text="Rename contestant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button

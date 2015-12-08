@@ -2,7 +2,6 @@ package com.steelcomputers.android.assignmenttwo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -60,10 +59,10 @@ public class PlayerDetailActivity
                 startActivity(settingsIntent);
                 return true;
             case R.id.action_refresh:
-                if (Player.isRunningAQuery()) {
+                if (Contestant.isRunningAQuery()) {
                     Toast.makeText(this, R.string.player_refresh_running, Toast.LENGTH_SHORT).show();
                 } else {
-                    Player.queryPlayers();
+                    Contestant.queryPlayers();
                     boolean sync_data = Preferences.getSharedPreferences().getBoolean("cloud_sync", false);
                     Toast.makeText(this, sync_data ? R.string.refresh_remote : R.string.refresh_remote, Toast.LENGTH_SHORT).show();
                 }
@@ -85,10 +84,10 @@ public class PlayerDetailActivity
      * indicating that a match should start.
      */
     @Override
-    public void onStartMatch(Player playerOne, Player playerTwo) {
+    public void onStartMatch(Contestant contestantOne, Contestant contestantTwo) {
         Intent gameEmulator = new Intent(this, GameEmulator.class);
-        gameEmulator.putExtra(GameEmulatorFragment.ARG_PLAYER_ONE, Player.getPlayers().indexOf(playerOne));
-        gameEmulator.putExtra(GameEmulatorFragment.ARG_PLAYER_TWO, Player.getPlayers().indexOf(playerTwo));
+        gameEmulator.putExtra(GameEmulatorFragment.ARG_PLAYER_ONE, Contestant.getPlayers().indexOf(contestantOne));
+        gameEmulator.putExtra(GameEmulatorFragment.ARG_PLAYER_TWO, Contestant.getPlayers().indexOf(contestantTwo));
         startActivity(gameEmulator);
     }
 }

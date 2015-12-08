@@ -39,7 +39,7 @@ import java.util.List;
  */
 public class PlayerListActivity extends AppCompatActivity
         implements PlayerListFragment.Callbacks, PlayerDetailFragment.Callbacks,
-        SwipeRefreshLayout.OnRefreshListener, Player.PlayerListener {
+        SwipeRefreshLayout.OnRefreshListener, Contestant.PlayerListener {
 
     public static final int NETWORK_TIMEOUT_MILLIS = 5000;
 
@@ -54,11 +54,11 @@ public class PlayerListActivity extends AppCompatActivity
     @Override
     public void onRefresh() {
         final PlayerListActivity context = this;
-        if (Player.isRunningAQuery()) {
+        if (Contestant.isRunningAQuery()) {
             Toast.makeText(context, R.string.player_refresh_running, Toast.LENGTH_SHORT).show();
         } else {
-            Player.addListener(context);
-            Player.queryPlayers();
+            Contestant.addListener(context);
+            Contestant.queryPlayers();
             boolean sync_data = Preferences.getSharedPreferences().getBoolean("cloud_sync", false);
             Toast.makeText(this, sync_data ? R.string.refresh_remote : R.string.refresh_local, Toast.LENGTH_SHORT).show();
             new Handler().postDelayed(new Runnable() {
@@ -66,7 +66,7 @@ public class PlayerListActivity extends AppCompatActivity
                     if (mSwipeRefreshLayout.isRefreshing()) {
                         mSwipeRefreshLayout.setRefreshing(false);
                         Toast.makeText(context, getString(R.string.timeout), Toast.LENGTH_LONG).show();
-                        Player.removeListener(context);
+                        Contestant.removeListener(context);
                     }
                 }
             }, NETWORK_TIMEOUT_MILLIS);
@@ -74,10 +74,10 @@ public class PlayerListActivity extends AppCompatActivity
     }
 
     @Override
-    public void notifyChange(List<Player> players) {
+    public void notifyChange(List<Contestant> contestants) {
         // Stop refresh animation because a change happened.
         mSwipeRefreshLayout.setRefreshing(false);
-        Player.removeListener(this);
+        Contestant.removeListener(this);
     }
 
     @Override
@@ -91,13 +91,25 @@ public class PlayerListActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+
+
+        FloatingActionButton fabAddPlayer = (FloatingActionButton) findViewById(R.id.fabAddPlayer);
+        fabAddPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Player.getNewPlayerDialog(context).show();
+                Contestant.getNewPlayerDialog(context, 0).show();
             }
         });
+
+        FloatingActionButton fabAddTeam = (FloatingActionButton) findViewById(R.id.fabAddTeam);
+        fabAddTeam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Contestant.getNewPlayerDialog(context, 1).show();
+            }
+        });
+
+
 
         try {
             mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
@@ -155,7 +167,7 @@ public class PlayerListActivity extends AppCompatActivity
         if (mTwoPane) {
             if (id.equals(mSelection)) {
                 // Rename player if selected twice in two-pane mode
-                Player.getPlayers().get(playerId).getRenamePlayerDialog(this).show();
+                Contestant.getPlayers().get(playerId).getRenamePlayerDialog(this).show();
             } else {
                 // In two-pane mode, show the detail view in this activity by
                 // adding or replacing the detail fragment using a
@@ -185,11 +197,11 @@ public class PlayerListActivity extends AppCompatActivity
      * layouts.
      */
     @Override
-    public void onStartMatch(Player playerOne, Player playerTwo) {
+    public void onStartMatch(Contestant contestantOne, Contestant contestantTwo) {
         Bundle arguments = new Bundle();
 
-        arguments.putInt(GameEmulatorFragment.ARG_PLAYER_ONE, Player.getPlayers().indexOf(playerOne));
-        arguments.putInt(GameEmulatorFragment.ARG_PLAYER_TWO, Player.getPlayers().indexOf(playerTwo));
+        arguments.putInt(GameEmulatorFragment.ARG_PLAYER_ONE, Contestant.getPlayers().indexOf(contestantOne));
+        arguments.putInt(GameEmulatorFragment.ARG_PLAYER_TWO, Contestant.getPlayers().indexOf(contestantTwo));
         GameEmulatorFragment fragment = new GameEmulatorFragment();
         fragment.setArguments(arguments);
         getSupportFragmentManager().beginTransaction()

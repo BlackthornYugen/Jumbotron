@@ -76,10 +76,10 @@ public class GameEmulator extends AppCompatActivity {
                 startActivity(settingsIntent);
                 return true;
             case R.id.action_refresh:
-                if (Player.isRunningAQuery()) {
+                if (Contestant.isRunningAQuery()) {
                     Toast.makeText(this, R.string.player_refresh_running, Toast.LENGTH_SHORT).show();
                 } else {
-                    Player.queryPlayers();
+                    Contestant.queryPlayers();
                     boolean sync_data = Preferences.getSharedPreferences().getBoolean("data_sync", false);
                     Toast.makeText(this, sync_data ? R.string.refresh_remote : R.string.refresh_remote, Toast.LENGTH_SHORT).show();
                 }
