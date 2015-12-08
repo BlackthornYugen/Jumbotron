@@ -2,8 +2,8 @@ Jumbotron
 --------------------------------
 
 Jumbotron is (will be) a tool for tracking and displaying the scores of a game. Once
-tracked, scores will be stored on the device via sql lite and an option will be given
-to sync them to a remote server. A big feature of this application is the ability to 
+tracked, scores will be stored on the device via the parse lib and an option will be
+given to sync them to parse.com. A big feature of this application is the ability to 
 display scores via Chromecast. Schools could then use projectors or TVs equiped with a 
 Chromecast Dongle to have a low-buget Jumbotron. 
 
