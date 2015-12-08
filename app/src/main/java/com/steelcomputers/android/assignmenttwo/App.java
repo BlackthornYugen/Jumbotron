@@ -20,7 +20,7 @@ public class App extends Application {
 
         try {
             Parse.enableLocalDatastore(this);
-            ParseObject.registerSubclass(Player.class);
+            ParseObject.registerSubclass(Contestant.class);
             Parse.initialize(this, getString(R.string.parse_app_id), getString(R.string.parse_api_key));
             Log.d("App", "Parse library initialized");
         } catch (Exception e) {
@@ -28,7 +28,7 @@ public class App extends Application {
         }
 
         try {
-            Player.queryPlayers(false); // Load offline copy
+            Contestant.queryPlayers(false); // Load offline copy
             Log.d("App", "Loaded players from localdb");
         } catch (Exception e) {
             Log.e("App", "Failed to get players from localdb.", e);

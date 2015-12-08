@@ -10,6 +10,4 @@ public class Point
     Game currentGame;
     Contestant contestant;
     Time timeStamp;
-
-
 }

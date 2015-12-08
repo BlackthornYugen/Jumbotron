@@ -18,12 +18,12 @@ import java.util.List;
  *
  * Created by John Steel on 2015-11-02 from a template.
  */
-public class GameEmulatorFragment extends Fragment implements Player.PlayerListener {
+public class GameEmulatorFragment extends Fragment implements Contestant.PlayerListener {
 
     public static final String ARG_PLAYER_ONE = "player_one";
     public static final String ARG_PLAYER_TWO = "player_two";
     public static final String ARG_STATE_SAVED = "state_saved";
-    private Player[] mPlayer = new Player[2];
+    private Contestant[] mContestant = new Contestant[2];
     private Button[] mBtnWinner = new Button[2];
     private TextView[] mTxtName;
     private TextView[] mTxtWins;
@@ -38,14 +38,14 @@ public class GameEmulatorFragment extends Fragment implements Player.PlayerListe
         super.onCreate(savedInstanceState);
 
         if ( savedInstanceState != null && savedInstanceState.getBoolean(ARG_STATE_SAVED)) {
-            mPlayer[0] = (Player) savedInstanceState.getSerializable(ARG_PLAYER_ONE);
-            mPlayer[1] = (Player) savedInstanceState.getSerializable(ARG_PLAYER_TWO);
+            mContestant[0] = (Contestant) savedInstanceState.getSerializable(ARG_PLAYER_ONE);
+            mContestant[1] = (Contestant) savedInstanceState.getSerializable(ARG_PLAYER_TWO);
         } else {
             if (getArguments().containsKey(ARG_PLAYER_ONE)) {
-                mPlayer[0] = Player.getPlayers().get(getArguments().getInt(ARG_PLAYER_ONE));
+                mContestant[0] = Contestant.getPlayers().get(getArguments().getInt(ARG_PLAYER_ONE));
             }
             if (getArguments().containsKey(ARG_PLAYER_TWO)) {
-                mPlayer[1] = Player.getPlayers().get(getArguments().getInt(ARG_PLAYER_TWO));
+                mContestant[1] = Contestant.getPlayers().get(getArguments().getInt(ARG_PLAYER_TWO));
             }
         }
     }
@@ -75,22 +75,22 @@ public class GameEmulatorFragment extends Fragment implements Player.PlayerListe
         mBtnWinner[0].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                victory(mPlayer[0], mPlayer[1]);
+                victory(mContestant[0], mContestant[1]);
             }
         });
 
         mBtnWinner[1].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                victory(mPlayer[1], mPlayer[0]);
+                victory(mContestant[1], mContestant[0]);
             }
         });
 
         mBtnDraw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPlayer[0].addTie();
-                mPlayer[1].addTie();
+                mContestant[0].addTie();
+                mContestant[1].addTie();
             }
         });
 
@@ -102,28 +102,28 @@ public class GameEmulatorFragment extends Fragment implements Player.PlayerListe
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(ARG_STATE_SAVED, true);
-        outState.putSerializable(ARG_PLAYER_ONE, mPlayer[0]);
-        outState.putSerializable(ARG_PLAYER_TWO, mPlayer[1]);
+        outState.putSerializable(ARG_PLAYER_ONE, mContestant[0]);
+        outState.putSerializable(ARG_PLAYER_TWO, mContestant[1]);
     }
 
     private void setViewValues() {
         try {
             String playerWinsString = getContext().getString(R.string.game_emulator_player_wins);
-            mBtnWinner[0].setText(String.format(playerWinsString, mPlayer[0].getName()));
-            mBtnWinner[1].setText(String.format(playerWinsString, mPlayer[1].getName()));
+            mBtnWinner[0].setText(String.format(playerWinsString, mContestant[0].getName()));
+            mBtnWinner[1].setText(String.format(playerWinsString, mContestant[1].getName()));
 
-            for (int i = 0; i < mPlayer.length; i++) {
-                mTxtName[i].setText(mPlayer[i].getName());
-                mTxtWins[i].setText(Integer.toString(mPlayer[i].getWins()));
-                mTxtTies[i].setText(Integer.toString(mPlayer[i].getTies()));
-                mTxtLoss[i].setText(Integer.toString(mPlayer[i].getLosses()));
+            for (int i = 0; i < mContestant.length; i++) {
+                mTxtName[i].setText(mContestant[i].getName());
+                mTxtWins[i].setText(Integer.toString(mContestant[i].getWins()));
+                mTxtTies[i].setText(Integer.toString(mContestant[i].getTies()));
+                mTxtLoss[i].setText(Integer.toString(mContestant[i].getLosses()));
             }
         } catch (Exception e) {
             android.util.Log.e(getClass().getName(), "Failed to set fragment values", e);
         }
     }
 
-    private void victory(Player winner, Player looser) {
+    private void victory(Contestant winner, Contestant looser) {
         winner.addWin();
         looser.addLoss();
     }
@@ -131,17 +131,17 @@ public class GameEmulatorFragment extends Fragment implements Player.PlayerListe
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Player.addListener(this);
+        Contestant.addListener(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Player.removeListener(this);
+        Contestant.removeListener(this);
     }
 
     @Override
-    public void notifyChange(List<Player> players) {
+    public void notifyChange(List<Contestant> contestants) {
         setViewValues();
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
  *
  * Created by John Steel on 2015-10-31 from a template.
  */
-public class PlayerListFragment extends ListFragment implements Player.PlayerListener {
+public class PlayerListFragment extends ListFragment implements Contestant.PlayerListener {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -42,12 +42,12 @@ public class PlayerListFragment extends ListFragment implements Player.PlayerLis
     private int mActivatedPosition = ListView.INVALID_POSITION;
 
     @Override
-    public void notifyChange(List<Player> players) {
-        setListAdapter(new Player.ListAdapter(
+    public void notifyChange(List<Contestant> contestants) {
+        setListAdapter(new Contestant.ListAdapter(
                 getActivity(),
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
-                players));
+                contestants));
     }
 
     /**
@@ -83,11 +83,11 @@ public class PlayerListFragment extends ListFragment implements Player.PlayerLis
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-            setListAdapter(new Player.ListAdapter(
+            setListAdapter(new Contestant.ListAdapter(
                     getActivity(),
                     android.R.layout.simple_list_item_activated_1,
                     android.R.id.text1,
-                    Player.getPlayers()));
+                    Contestant.getPlayers()));
         } catch (Exception e) {
             Log.e("PlayerListFragment", "Can't create list adapter", e);
         }
@@ -112,7 +112,7 @@ public class PlayerListFragment extends ListFragment implements Player.PlayerLis
             throw new IllegalStateException("Activity must implement fragment's callbacks.");
         }
 
-        Player.addListener(this);
+        Contestant.addListener(this);
         mCallbacks = (Callbacks) activity;
     }
 
@@ -120,7 +120,7 @@ public class PlayerListFragment extends ListFragment implements Player.PlayerLis
     public void onDetach() {
         super.onDetach();
 
-        Player.removeListener(this);
+        Contestant.removeListener(this);
         mCallbacks = sDummyCallbacks;
     }
 
