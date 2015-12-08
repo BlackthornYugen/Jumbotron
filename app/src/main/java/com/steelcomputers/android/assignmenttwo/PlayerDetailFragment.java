@@ -134,14 +134,14 @@ public class PlayerDetailFragment extends Fragment implements Contestant.PlayerL
                     mLosses.setText(Integer.toString(mContestant.getLosses()));
                     mTies.setText(Integer.toString(mContestant.getTies()));
 
-                    String playerType = " " + mContestant.DefineIfPlayerOrTeam();
+                    String playerType = " " + mContestant.DefineIfPlayerOrTeam(this);
 
                     mBtnRename.setText(this.getResources().getString(R.string.player_rename) + playerType);
                     mBtnDelete.setText(this.getResources().getString(R.string.player_delete) + playerType);
 
                 } else {
                     if (mAppBar != null) {
-                        mAppBar.setTitle("(Deleted) " + mContestant.getName());
+                        mAppBar.setTitle(this.getResources().getString(R.string.deleted) + mContestant.getName());
                     }
 
                     mWins.setText("-");

@@ -2,6 +2,7 @@ package com.steelcomputers.android.assignmenttwo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -56,6 +57,15 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     public void addPoint(Contestant other)
     {
         setPoints(getPoints(other) + 1, other);
+        doSave();
+    }
+
+    /**
+     * The action of lossing a point to the contestant
+     */
+    public void minusPoint(Contestant other)
+    {
+        setPoints(getPoints(other) - 1, other);
         doSave();
     }
 
@@ -326,40 +336,49 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     @NonNull
     public static AlertDialog.Builder getNewPlayerDialog(Activity context, int isATeam)
     {
-        String teamOrPlayer = DefineIfPlayerOrTeam(isATeam);
+        String teamOrPlayer = DefineIfPlayerOrTeam(isATeam, context);
+
+        String title = context.getResources().getString(R.string.enter)  + teamOrPlayer + " "
+                + context.getResources().getString(R.string.name);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Enter " + teamOrPlayer + " Name");
-        setCreateOrRenameDialogButtons(builder, context, new Contestant(isATeam), "Add " + teamOrPlayer, "Cancel");
+        builder.setTitle(title);
+        setCreateOrRenameDialogButtons(builder, context, new Contestant(isATeam),
+                context.getResources().getString(R.string.add) + teamOrPlayer,
+                context.getResources().getString(R.string.cancel));
         return builder;
     }
 
-    static String DefineIfPlayerOrTeam(int isATeam)
+    static String DefineIfPlayerOrTeam(int isATeam, Activity context)
     {
         if (Integer.compare(isATeam, 1) == 0)
         {
-            return "Team";
+            return context.getResources().getString(R.string.team);
         }
-        return "Player";
+        return context.getResources().getString(R.string.player);
     }
 
     /**
      * For the current Instance of Contestant
      * @return
      */
-    public String DefineIfPlayerOrTeam()
+    public String DefineIfPlayerOrTeam(PlayerDetailFragment context)
     {
-        if (Integer.compare(getIsATeam(), 1) == 0){
-            return "Team";
+        if (Integer.compare(getIsATeam(), 1) == 0)
+        {
+            return context.getResources().getString(R.string.team);
         }
-        return "Player";
+        return context.getResources().getString(R.string.player);
     }
 
     @NonNull
     public AlertDialog.Builder getRenamePlayerDialog(Activity context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(String.format("Rename \"%s\"", getName()));
-        setCreateOrRenameDialogButtons(builder, context, this, "Rename", "Don't rename");
+        builder.setTitle(String.format(context.getResources().getString(R.string.rename) +
+                " \"%s\"", getName()));
+        setCreateOrRenameDialogButtons(builder, context, this,
+                context.getResources().getString(R.string.rename),
+                context.getResources().getString(R.string.dont_rename));
         return builder;
     }
 
@@ -437,7 +456,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         ListAdapter listAdapter = new ListAdapter(context,
                 android.R.layout.simple_list_item_activated_1, contestants);
         builder.setAdapter(listAdapter, listener);
-        builder.setTitle("Select an opponent");
+        builder.setTitle(context.getResources().getString(R.string.select_an_opponent));
         return builder;
     }
 

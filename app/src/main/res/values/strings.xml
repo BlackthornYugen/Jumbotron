@@ -6,9 +6,9 @@ The strings here are used all over the Score Tracker application.
 Created by John Steel on 2015-10-31.
 -->
 <resources>
-    <string name="app_name">Score Tracker 9000</string>
-    <string name="title_activity_settings">Score Tracker 9000 Settings</string>
-    <string name="title_player_detail">Player Detail</string>
+    <string name="app_name">Jumbotron</string>
+    <string name="title_activity_settings">Jumbotron Settings</string>
+    <string name="title_player_detail">Contestant Detail</string>
     <string name="points">Points</string>
     <string name="losses">Losses</string>
     <string name="wins">Wins</string>
@@ -27,13 +27,34 @@ Created by John Steel on 2015-10-31.
     <string name="pref_title_system_sync_settings">System sync settings</string>
     <string name="title_activity_game_emulator">GameEmulator</string>
     <string name="action_settings">Settings</string>
-    <string name="game_emulator_reset_game">Reset Game</string>
-    <string name="game_emulator_player_wins">%s Wins</string>
-    <string name="player_two">Player Two</string>
-    <string name="player_one">Player One</string>
+
+
+    <string name="player_two">Contestant Two</string>
+    <string name="player_one">Contestant One</string>
     <string name="refresh">Refresh</string>
     <string name="refresh_local">Reloading data from device...</string>
     <string name="refresh_remote">Reloading data from the web...</string>
     <string name="title_activity_list_teams">ListTeams</string>
     <string name="title_activity_team_detail">TeamDetailActivity</string>
+
+    <!-- Added on 2015-12-08 -->
+    <string name="game_emulator_player_score">%s +1 Point</string>
+    <string name="game_emulator_player_minus">%s -1 Point</string>
+
+    <string name="game_emulator_start_scratch">Start From Scratch Again</string>
+    <string name="game_emulator_reset_game">Finish Current Game And Start New</string>
+    <string name="is_a_tie">Is A Tie</string>
+    <string name="won">Won</string>
+
+    <!-- Added on 2015-12-08. Removing literals from code -->
+    <string name="deleted">(Deleted)</string>
+    <string name="enter">Enter</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="team">Team</string>
+    <string name="player">Player</string>
+    <string name="rename">Rename</string>
+    <string name="dont_rename">Dont Rename</string>
+    <string name="select_an_opponent">Select an opponent</string>
+
 </resources>

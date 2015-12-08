@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ import java.util.List;
  * A placeholder fragment containing a simple view.
  *
  * Created by John Steel on 2015-11-02 from a template.
+ * Modified by Manuel Lopez on 2015-12-08
  */
 public class GameEmulatorFragment extends Fragment implements Contestant.PlayerListener {
 
@@ -24,9 +26,11 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
     public static final String ARG_PLAYER_TWO = "player_two";
     public static final String ARG_STATE_SAVED = "state_saved";
     private Contestant[] mContestant = new Contestant[2];
-    private Button[] mBtnWinner = new Button[2];
+    private Button[] mBtnScore = new Button[2];
+    private Button[] mBtnMinus = new Button[2];
 
     private Button mBtnResetGame;
+    private Button mBtnStartFromScratch;
 
     private TextView[] mTxtName;
     private TextView[] mTxtPoints;
@@ -56,9 +60,15 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_game_emulator, container, false);
 
-        mBtnWinner[0] = ((Button) rootView.findViewById(R.id.player_one_wins));
-        mBtnWinner[1] = ((Button) rootView.findViewById(R.id.player_two_wins));
+        mBtnScore[0] = ((Button) rootView.findViewById(R.id.player_one_score));
+        mBtnScore[1] = ((Button) rootView.findViewById(R.id.player_two_score));
+
+        mBtnMinus[0] = ((Button) rootView.findViewById(R.id.player_one_minus));
+        mBtnMinus[1] = ((Button) rootView.findViewById(R.id.player_two_minus));
+
+
         mBtnResetGame = ((Button) rootView.findViewById(R.id.reset_game));
+        mBtnStartFromScratch = ((Button) rootView.findViewById(R.id.start_scratch));
 
         mTxtName = new TextView[]{
                 (TextView) rootView.findViewById(R.id.playerOneName),
@@ -67,25 +77,51 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
                 (TextView) rootView.findViewById(R.id.playerOnePoints),
                 (TextView) rootView.findViewById(R.id.playerTwoPoints)};
 
-        mBtnWinner[0].setOnClickListener(new View.OnClickListener() {
+        mBtnScore[0].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 victory(mContestant[0], mContestant[1]);
             }
         });
 
-        mBtnWinner[1].setOnClickListener(new View.OnClickListener() {
+        mBtnScore[1].setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 victory(mContestant[1], mContestant[0]);
             }
         });
 
+
+        mBtnMinus[0].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                minus(mContestant[0], mContestant[1]);
+            }
+        });
+
+        mBtnMinus[1].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                minus(mContestant[1], mContestant[0]);
+            }
+        });
+
+
         mBtnResetGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addWinLosAndDraw(mContestant[1], mContestant[0]);
 
+                mContestant[1].resetGame(mContestant[0]);
+                mContestant[0].resetGame(mContestant[1]);
+
+                setViewValues();
+            }
+        });
+
+        mBtnStartFromScratch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 mContestant[1].resetGame(mContestant[0]);
                 mContestant[0].resetGame(mContestant[1]);
 
@@ -109,16 +145,25 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
         {
             one.addTie();
             two.addTie();
+
+            Toast.makeText(this.getContext(),
+                    this.getResources().getString(R.string.is_a_tie) , Toast.LENGTH_LONG).show();
         }
         else if (Integer.compare(one.getPoints(two), two.getPoints(one)) < 0)
         {
             one.addLoss();
             two.addWin();
+
+            Toast.makeText(this.getContext(), two.getName() + " " +
+                    this.getResources().getString(R.string.won) , Toast.LENGTH_LONG).show();
         }
         else if (Integer.compare(one.getPoints(two), two.getPoints(one)) > 0)
         {
             one.addWin();
             two.addLoss();
+
+            Toast.makeText(this.getContext(), one.getName() + " " +
+                    this.getResources().getString(R.string.won) , Toast.LENGTH_LONG).show();
         }
     }
 
@@ -132,9 +177,15 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
 
     private void setViewValues() {
         try {
-            String playerWinsString = getContext().getString(R.string.game_emulator_player_wins);
-            mBtnWinner[0].setText(String.format(playerWinsString, mContestant[0].getName()));
-            mBtnWinner[1].setText(String.format(playerWinsString, mContestant[1].getName()));
+            String playerWinsString = getContext().getString(R.string.game_emulator_player_score);
+
+            mBtnScore[0].setText(String.format(playerWinsString, mContestant[0].getName()));
+            mBtnScore[1].setText(String.format(playerWinsString, mContestant[1].getName()));
+
+            String playerMinusString = getContext().getString(R.string.game_emulator_player_minus);
+
+            mBtnMinus[0].setText(String.format(playerMinusString, mContestant[0].getName()));
+            mBtnMinus[1].setText(String.format(playerMinusString, mContestant[1].getName()));
 
             for (int i = 0; i < mContestant.length; i++) {
                 mTxtName[i].setText(mContestant[i].getName());
@@ -143,7 +194,6 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
             mTxtPoints[0].setText(Integer.toString(mContestant[0].getPoints(mContestant[1])));
             mTxtPoints[1].setText(Integer.toString(mContestant[1].getPoints(mContestant[0])));
 
-
         } catch (Exception e) {
             android.util.Log.e(getClass().getName(), "Failed to set fragment values", e);
         }
@@ -151,8 +201,14 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
 
     private void victory(Contestant winner, Contestant looser) {
         winner.addPoint(looser);
-//        looser.addLoss();
     }
+
+
+    private void minus(Contestant winner, Contestant looser) {
+        winner.minusPoint(looser);
+    }
+
+
 
     @Override
     public void onAttach(Context context) {
