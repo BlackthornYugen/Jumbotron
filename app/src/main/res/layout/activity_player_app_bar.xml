@@ -30,10 +30,18 @@ Created by John Steel on 2015-10-31 from a template.
         <include layout="@layout/activity_player_list" />
     </FrameLayout>
 
-    <android.support.design.widget.FloatingActionButton android:id="@+id/fab"
+    <android.support.design.widget.FloatingActionButton android:id="@+id/fabAddTeam"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin" android:src="@android:drawable/ic_input_add"
+        android:layout_gravity="bottom|start" />
+
+
+    <android.support.design.widget.FloatingActionButton android:id="@+id/fabAddPlayer"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin" android:src="@android:drawable/ic_input_add"
         android:layout_gravity="bottom|end" />
+
+
 
 
 </android.support.design.widget.CoordinatorLayout>

@@ -91,13 +91,25 @@ public class PlayerListActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+
+
+        FloatingActionButton fabAddPlayer = (FloatingActionButton) findViewById(R.id.fabAddPlayer);
+        fabAddPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Player.getNewPlayerDialog(context).show();
             }
         });
+
+        FloatingActionButton fabAddTeam = (FloatingActionButton) findViewById(R.id.fabAddTeam);
+        fabAddTeam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Player.getNewPlayerDialog(context).show();
+            }
+        });
+
+
 
         try {
             mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);

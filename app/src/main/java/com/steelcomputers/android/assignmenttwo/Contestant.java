@@ -5,6 +5,16 @@ package com.steelcomputers.android.assignmenttwo;
  */
 public class Contestant {
 
-    boolean isATeam;
+    boolean isATeam;//will indicate if is a team the contestant
+
+
+    /**
+     * The action of adding a point to the contestant
+     */
+    public void AddPoint()
+    {
+
+    }
+
 
  }
