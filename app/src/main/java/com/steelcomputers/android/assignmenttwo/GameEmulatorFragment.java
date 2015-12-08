@@ -84,6 +84,8 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
         mBtnResetGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addWinLosAndDraw(mContestant[1], mContestant[0]);
+
                 mContestant[1].resetGame(mContestant[0]);
                 mContestant[0].resetGame(mContestant[1]);
 
@@ -93,6 +95,31 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
 
         setViewValues();
         return rootView;
+    }
+
+    /**
+     * Based on their current game points will decided which one
+     * was the winner, losses, draw and will added to player
+     * @param one
+     * @param two
+     */
+    void addWinLosAndDraw(Contestant one, Contestant two)
+    {
+        if (Integer.compare(one.getPoints(two), two.getPoints(one)) == 0)
+        {
+            one.addTie();
+            two.addTie();
+        }
+        else if (Integer.compare(one.getPoints(two), two.getPoints(one)) < 0)
+        {
+            one.addLoss();
+            two.addWin();
+        }
+        else if (Integer.compare(one.getPoints(two), two.getPoints(one)) > 0)
+        {
+            one.addWin();
+            two.addLoss();
+        }
     }
 
     @Override

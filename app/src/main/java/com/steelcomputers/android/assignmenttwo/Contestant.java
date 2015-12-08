@@ -41,14 +41,13 @@ import java.util.List;
 @ParseClassName("Contestant")
 public class Contestant extends ParseObject implements java.io.Serializable {
 
-    boolean isATeam;//will indicate if is a team the contestant
-
     public Contestant() {
         // Empty Constructor
     }
 
-    public Contestant(boolean isATeam) {
-        this.isATeam = isATeam;
+    public Contestant(int isATeam) {
+        setIsATeam(isATeam);
+        doSave();
     }
 
     /**
@@ -69,23 +68,39 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         setPoints(0, other);
     }
 
-//    public void addLoss() {
-//        setLosses(getLosses() + 1);
-//        doSave();
-//    }
-//
-//    public void addWin() {
-//        setWins(getWins() + 1);
-//        doSave();
-//    }
-//
-//    public void addTie() {
-//        setTies(getTies() + 1);
-//        doSave();
-//    }
+    /**
+     * If a contestant instance is deleted need to reset all keys could have in
+     * other contestants. So if a new player in the future has the same key
+     * will start with zero.
+     *
+     * Could be improved just deleting the key
+     */
+    void deleteFromAllPlayers()
+    {
+        for (int i = 0; i < mContestants.size(); i++)
+        {
+            mContestants.get(i).resetGame(this);
+        }
+    }
+
+    public void addLoss() {
+        setLosses(getLosses() + 1);
+        doSave();
+    }
+
+    public void addWin() {
+        setWins(getWins() + 1);
+        doSave();
+    }
+
+    public void addTie() {
+        setTies(getTies() + 1);
+        doSave();
+    }
 
     public static class COLUMN {
         public static final String POINTS = "point";
+        public static final String ISATEAM = "isATeam";
         public static final String NAME   = "name";
         public static final String WINS   = "wins";
         public static final String LOSSES = "losses";
@@ -122,6 +137,19 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         } catch (Exception e) {
             Log.e(Contestant.class.getName(),"Unable to set contestants list", e);
         }
+    }
+
+    //will indicate if is a team the contestant
+    public int getIsATeam()
+    {
+        //0 is false
+        //1 is true
+        return getInt(COLUMN.ISATEAM);
+    }
+
+    public void setIsATeam(int isATeam)
+    {
+        put(COLUMN.ISATEAM, isATeam);
     }
 
 
@@ -296,7 +324,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     }
 
     @NonNull
-    public static AlertDialog.Builder getNewPlayerDialog(Activity context, boolean isATeam)
+    public static AlertDialog.Builder getNewPlayerDialog(Activity context, int isATeam)
     {
         String teamOrPlayer = DefineIfPlayerOrTeam(isATeam);
 
@@ -306,9 +334,22 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         return builder;
     }
 
-    static String DefineIfPlayerOrTeam(boolean isATeam)
+    static String DefineIfPlayerOrTeam(int isATeam)
     {
-        if (isATeam){
+        if (Integer.compare(isATeam, 1) == 0)
+        {
+            return "Team";
+        }
+        return "Player";
+    }
+
+    /**
+     * For the current Instance of Contestant
+     * @return
+     */
+    public String DefineIfPlayerOrTeam()
+    {
+        if (Integer.compare(getIsATeam(), 1) == 0){
             return "Team";
         }
         return "Player";
@@ -431,14 +472,22 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         }
     }
 
-    private void doDelete() {
-        unpinInBackground(new DeleteCallback() {
+    private void doDelete()
+    {
+        unpinInBackground(new DeleteCallback()
+        {
             @Override
-            public void done(ParseException parseException) {
-                try {
-                    if (parseException == null) {
+            public void done(ParseException parseException)
+            {
+                try
+                {
+                    if (parseException == null)
+                    {
+                        deleteFromAllPlayers();
                         Contestant.queryPlayers(false); // Update players
-                    } else {
+                    }
+                    else
+                    {
                         throw parseException;
                     }
                 } catch (ParseException e) {
@@ -447,13 +496,19 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             }
         });
 
-        if (Preferences.getSharedPreferences().getBoolean("cloud_sync", false)) {
-            deleteEventually(new DeleteCallback() {
+        if (Preferences.getSharedPreferences().getBoolean("cloud_sync", false))
+        {
+            deleteEventually(new DeleteCallback()
+            {
                 @Override
-                public void done(ParseException e) {
-                    if (e != null) {
+                public void done(ParseException e)
+                {
+                    if (e != null)
+                    {
                         Log.e("Contestant", "Contestant could not be deleted remotely", e);
                     }
+                    else
+                        deleteFromAllPlayers();
                 }
             });
         }

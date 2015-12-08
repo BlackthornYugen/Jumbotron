@@ -18,7 +18,8 @@ Created by John Steel on 2015-10-31.
     <string name="timeout">Timed out when refreshing contestants.</string>
     <string name="player_refresh_running">Refresh already running!</string>
     <string name="player_delete_confirmation">Are you sure you want to delete %s?</string>
-    <string name="player_delete">Delete contestant</string>
+    <string name="player_delete">Delete</string>
+    <string name="player_rename">Rename</string>
     <string name="cancel_delete">Cancel</string>
 
     <!-- Settings for Data & Sync -->
