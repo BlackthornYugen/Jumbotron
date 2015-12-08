@@ -25,10 +25,11 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
     public static final String ARG_STATE_SAVED = "state_saved";
     private Contestant[] mContestant = new Contestant[2];
     private Button[] mBtnWinner = new Button[2];
+
+    private Button mBtnResetGame;
+
     private TextView[] mTxtName;
-    private TextView[] mTxtWins;
-    private TextView[] mTxtTies;
-    private TextView[] mTxtLoss;
+    private TextView[] mTxtPoints;
 
     public GameEmulatorFragment() {
     }
@@ -57,20 +58,14 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
 
         mBtnWinner[0] = ((Button) rootView.findViewById(R.id.player_one_wins));
         mBtnWinner[1] = ((Button) rootView.findViewById(R.id.player_two_wins));
-        Button mBtnDraw = ((Button) rootView.findViewById(R.id.draw));
+        mBtnResetGame = ((Button) rootView.findViewById(R.id.reset_game));
 
         mTxtName = new TextView[]{
                 (TextView) rootView.findViewById(R.id.playerOneName),
                 (TextView) rootView.findViewById(R.id.playerTwoName)};
-        mTxtWins = new TextView[]{
-                (TextView) rootView.findViewById(R.id.playerOneWins),
-                (TextView) rootView.findViewById(R.id.playerTwoWins)};
-        mTxtTies = new TextView[]{
-                (TextView) rootView.findViewById(R.id.playerOneTies),
-                (TextView) rootView.findViewById(R.id.playerTwoTies)};
-        mTxtLoss = new TextView[]{
-                (TextView) rootView.findViewById(R.id.playerOneLoss),
-                (TextView) rootView.findViewById(R.id.playerTwoLoss)};
+        mTxtPoints = new TextView[]{
+                (TextView) rootView.findViewById(R.id.playerOnePoints),
+                (TextView) rootView.findViewById(R.id.playerTwoPoints)};
 
         mBtnWinner[0].setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,11 +81,13 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
             }
         });
 
-        mBtnDraw.setOnClickListener(new View.OnClickListener() {
+        mBtnResetGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mContestant[0].addTie();
-                mContestant[1].addTie();
+                mContestant[1].resetGame(mContestant[0]);
+                mContestant[0].resetGame(mContestant[1]);
+
+                setViewValues();
             }
         });
 
@@ -114,18 +111,20 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
 
             for (int i = 0; i < mContestant.length; i++) {
                 mTxtName[i].setText(mContestant[i].getName());
-                mTxtWins[i].setText(Integer.toString(mContestant[i].getWins()));
-                mTxtTies[i].setText(Integer.toString(mContestant[i].getTies()));
-                mTxtLoss[i].setText(Integer.toString(mContestant[i].getLosses()));
             }
+
+            mTxtPoints[0].setText(Integer.toString(mContestant[0].getPoints(mContestant[1])));
+            mTxtPoints[1].setText(Integer.toString(mContestant[1].getPoints(mContestant[0])));
+
+
         } catch (Exception e) {
             android.util.Log.e(getClass().getName(), "Failed to set fragment values", e);
         }
     }
 
     private void victory(Contestant winner, Contestant looser) {
-        winner.addWin();
-        looser.addLoss();
+        winner.addPoint(looser);
+//        looser.addLoss();
     }
 
     @Override

@@ -97,7 +97,7 @@ public class PlayerListActivity extends AppCompatActivity
         fabAddPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Contestant.getNewPlayerDialog(context).show();
+                Contestant.getNewPlayerDialog(context, false).show();
             }
         });
 
@@ -105,7 +105,7 @@ public class PlayerListActivity extends AppCompatActivity
         fabAddTeam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Contestant.getNewPlayerDialog(context).show();
+                Contestant.getNewPlayerDialog(context, true).show();
             }
         });
 

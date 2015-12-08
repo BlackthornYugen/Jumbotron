@@ -47,28 +47,42 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         // Empty Constructor
     }
 
+    public Contestant(boolean isATeam) {
+        this.isATeam = isATeam;
+    }
+
     /**
      * The action of adding a point to the contestant
      */
-    public void AddPoint()
+    public void addPoint(Contestant other)
     {
-        setPoints(getPoints() + 1);
-    }
-
-    public void addLoss() {
-        setLosses(getLosses() + 1);
+        setPoints(getPoints(other) + 1, other);
         doSave();
     }
 
-    public void addWin() {
-        setWins(getWins() + 1);
-        doSave();
+    /**
+     * The action of reseting a game
+     * @param other The specific game will be reseted
+     */
+    public void resetGame(Contestant other)
+    {
+        setPoints(0, other);
     }
 
-    public void addTie() {
-        setTies(getTies() + 1);
-        doSave();
-    }
+//    public void addLoss() {
+//        setLosses(getLosses() + 1);
+//        doSave();
+//    }
+//
+//    public void addWin() {
+//        setWins(getWins() + 1);
+//        doSave();
+//    }
+//
+//    public void addTie() {
+//        setTies(getTies() + 1);
+//        doSave();
+//    }
 
     public static class COLUMN {
         public static final String POINTS = "point";
@@ -111,11 +125,11 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     }
 
 
-    public int getPoints() {
-        return getInt(COLUMN.POINTS);
+    public int getPoints(Contestant other) {
+        return getInt(COLUMN.POINTS + "." + other.getName());
     }
-    public void setPoints(int points) {
-        put(COLUMN.POINTS, points);
+    public void setPoints(int points, Contestant other) {
+        put(COLUMN.POINTS + "." + other.getName(), points);
     }
 
 
@@ -282,11 +296,22 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     }
 
     @NonNull
-    public static AlertDialog.Builder getNewPlayerDialog(Activity context) {
+    public static AlertDialog.Builder getNewPlayerDialog(Activity context, boolean isATeam)
+    {
+        String teamOrPlayer = DefineIfPlayerOrTeam(isATeam);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Enter Contestant Name");
-        setCreateOrRenameDialogButtons(builder, context, new Contestant(), "Add Contestant", "Cancel");
+        builder.setTitle("Enter " + teamOrPlayer + " Name");
+        setCreateOrRenameDialogButtons(builder, context, new Contestant(isATeam), "Add " + teamOrPlayer, "Cancel");
         return builder;
+    }
+
+    static String DefineIfPlayerOrTeam(boolean isATeam)
+    {
+        if (isATeam){
+            return "Team";
+        }
+        return "Player";
     }
 
     @NonNull
