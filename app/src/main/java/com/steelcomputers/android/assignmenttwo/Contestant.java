@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -48,7 +49,6 @@ public class Contestant extends ParseObject implements java.io.Serializable {
 
     public Contestant(int isATeam) {
         setIsATeam(isATeam);
-        //setWins(0);
         doSave();
     }
 
@@ -165,10 +165,10 @@ public class Contestant extends ParseObject implements java.io.Serializable {
 
 
     public int getPoints(Contestant other) {
-        return getInt(COLUMN.POINTS + "." + other.getName());
+        return getInt(COLUMN.POINTS + "_" + other.getName());
     }
     public void setPoints(int points, Contestant other) {
-        put(COLUMN.POINTS + "." + other.getName(), points);
+        put(COLUMN.POINTS + "_" + other.getName(), points);
     }
 
 
@@ -387,7 +387,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     }
 
     private static void setCreateOrRenameDialogButtons(AlertDialog.Builder builder,
-                                                       Activity context,
+                                                       final Activity context,
                                                        final Contestant contestant,
                                                        String positive,
                                                        String negative) {
@@ -431,8 +431,23 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-                    contestant.setName(input.getText().toString().trim());
+
+                    boolean isValidName = isValidInputName(input.getText().toString());
+
+                    if (isValidName)
+                    {
+                        contestant.setName(input.getText().toString().trim());
+                    }
+                    else
+                    {
+                        dialog.cancel();
+                        Toast.makeText(context,
+                                context.getResources().getString(R.string.new_name_invalid), Toast.LENGTH_LONG).show();
+                        mContestants.remove(contestant);//removes the recently added constestant
+                    }
+                    contestant.doDelete();
                     contestant.doSave();
+
                 } catch (Exception e) {
                     Log.e(this.getClass().getName(), "Couldn't save contestant.", e);
                 }
@@ -447,6 +462,28 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             }
         });
     }
+
+    /**
+     * Will make sure the input new name is not empty and doestn exist already
+     * @param newName
+     * @return
+     */
+    static boolean isValidInputName(String newName)
+    {
+        if (newName.equals(null) || newName.trim().equals(""))
+        {
+            return false;
+        }
+
+        for (int i = 0; i < mContestants.size(); i++) {
+            if (newName.trim().equals(mContestants.get(i).getName()))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     @NonNull
     public AlertDialog.Builder getPlayersDialog(Activity context,

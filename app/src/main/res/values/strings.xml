@@ -56,5 +56,6 @@ Created by John Steel on 2015-10-31.
     <string name="rename">Rename</string>
     <string name="dont_rename">Dont Rename</string>
     <string name="select_an_opponent">Select an opponent</string>
+    <string name="new_name_invalid">The selected new name was invalid or used</string>
 
 </resources>
