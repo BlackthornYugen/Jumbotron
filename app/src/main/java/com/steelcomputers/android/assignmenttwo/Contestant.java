@@ -48,6 +48,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
 
     public Contestant(int isATeam) {
         setIsATeam(isATeam);
+        //setWins(0);
         doSave();
     }
 
@@ -214,6 +215,9 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         } catch (Exception e) {
             Log.e("Contestant", "Couldn't load sync preference.", e);
         }
+
+        String msg = "useNetwork " + useNetwork;
+        Log.d("",msg);
         queryPlayers(useNetwork);
     }
 
