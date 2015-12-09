@@ -4,6 +4,7 @@ fragment_game_emulator.xml
 This is the layout for the game emulator fragment.
 
 Created by John Steel on 2015-11-02 from a template.
+Modified by Manuel Lopez on 2015-12-08
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
@@ -15,39 +16,55 @@ Created by John Steel on 2015-11-02 from a template.
     tools:context="com.steelcomputers.android.assignmenttwo.GameEmulatorFragment">
 
     <Button
-        android:id="@+id/player_one_wins"
-        android:text="@string/game_emulator_player_wins"
+        android:id="@+id/player_one_score"
+        android:text="@string/game_emulator_player_score"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
-        android:id="@+id/player_two_wins"
-        android:text="@string/game_emulator_player_wins"
+        android:id="@+id/player_two_score"
+        android:text="@string/game_emulator_player_score"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+    <Button
+        android:id="@+id/player_one_minus"
+        android:text="@string/game_emulator_player_minus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
-        android:id="@+id/draw"
-        android:text="@string/game_emulator_draw"
+        android:id="@+id/player_two_minus"
+        android:text="@string/game_emulator_player_minus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
+
+    <Button
+        android:id="@+id/reset_game"
+        android:text="@string/game_emulator_reset_game"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/start_scratch"
+        android:text="@string/game_emulator_start_scratch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
         <TableLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:stretchColumns="0">
             <TableRow android:layout_width="match_parent" android:layout_height="wrap_content">
                 <TextView style="@style/TableHeader" android:text="@string/name" />
-                <TextView style="@style/TableHeader" android:text="@string/wins" />
-                <TextView style="@style/TableHeader" android:text="@string/ties" />
-                <TextView style="@style/TableHeader" android:text="@string/losses" />
+                <TextView style="@style/TableHeader" android:text="@string/points" />
+
             </TableRow>
             <TableRow android:layout_width="match_parent" android:layout_height="wrap_content">
                 <TextView android:id="@+id/playerOneName" style="@style/TableHeader" android:text="@string/player_one" />
-                <TextView android:id="@+id/playerOneWins" style="@style/TableData" />
-                <TextView android:id="@+id/playerOneTies" style="@style/TableData" />
-                <TextView android:id="@+id/playerOneLoss" style="@style/TableData" />
+                <TextView android:id="@+id/playerOnePoints" style="@style/TableData" />
+
             </TableRow>
             <TableRow android:layout_width="match_parent" android:layout_height="wrap_content">
 
                 <TextView android:id="@+id/playerTwoName" style="@style/TableHeader" android:text="@string/player_two"/>
-                <TextView android:id="@+id/playerTwoWins" style="@style/TableData" />
-                <TextView android:id="@+id/playerTwoTies" style="@style/TableData" />
-                <TextView android:id="@+id/playerTwoLoss" style="@style/TableData" />
+                <TextView android:id="@+id/playerTwoPoints" style="@style/TableData" />
 
             </TableRow>
         </TableLayout>

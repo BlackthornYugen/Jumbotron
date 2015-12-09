@@ -2,6 +2,7 @@ package com.steelcomputers.android.assignmenttwo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -29,19 +30,67 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Player.java
+ * Contestant.java
  *
  * Extends {@link ParseObject} to facilitate local and remote storage. Dialog
  * factories have been made to make renaming, deleting and creating players as
  * easy as possible to do without having knowledge of Parse's library.
  *
  * Created by John Steel on 2015-10-26.
+ * Modified by Manuel Lopez on 2015-12-08
  */
-@ParseClassName("Player")
-public class Player extends ParseObject implements java.io.Serializable {
+@ParseClassName("Contestant")
+public class Contestant extends ParseObject implements java.io.Serializable {
 
-    public Player() {
+    public Contestant() {
         // Empty Constructor
+    }
+
+    public Contestant(int isATeam) {
+        setIsATeam(isATeam);
+        doSave();
+    }
+
+    /**
+     * The action of adding a point to the contestant
+     */
+    public void addPoint(Contestant other)
+    {
+        setPoints(getPoints(other) + 1, other);
+        doSave();
+    }
+
+    /**
+     * The action of lossing a point to the contestant
+     */
+    public void minusPoint(Contestant other)
+    {
+        setPoints(getPoints(other) - 1, other);
+        doSave();
+    }
+
+    /**
+     * The action of reseting a game
+     * @param other The specific game will be reseted
+     */
+    public void resetGame(Contestant other)
+    {
+        setPoints(0, other);
+    }
+
+    /**
+     * If a contestant instance is deleted need to reset all keys could have in
+     * other contestants. So if a new player in the future has the same key
+     * will start with zero.
+     *
+     * Could be improved just deleting the key
+     */
+    void deleteFromAllPlayers()
+    {
+        for (int i = 0; i < mContestants.size(); i++)
+        {
+            mContestants.get(i).resetGame(this);
+        }
     }
 
     public void addLoss() {
@@ -60,23 +109,25 @@ public class Player extends ParseObject implements java.io.Serializable {
     }
 
     public static class COLUMN {
+        public static final String POINTS = "point";
+        public static final String ISATEAM = "isATeam";
         public static final String NAME   = "name";
         public static final String WINS   = "wins";
         public static final String LOSSES = "losses";
         public static final String TIES   = "ties";
     }
 
-    private static List<Player> mPlayers           = new ArrayList<Player>();
+    private static List<Contestant> mContestants = new ArrayList<Contestant>();
     private static List<PlayerListener> mListeners = new ArrayList<PlayerListener>();
     private static boolean mIsQueryRunning         = false;
     private String mID;
 
-    public static List<Player> getPlayers() {
-        if(!mIsQueryRunning && mPlayers.size() == 0) {
+    public static List<Contestant> getPlayers() {
+        if(!mIsQueryRunning && mContestants.size() == 0) {
             // If a query isn't running & no players are found, we better check localdb
             queryPlayers(false);
         }
-        return mPlayers;
+        return mContestants;
     }
     public static void addListener(PlayerListener listener) {
         if (mListeners == null) {
@@ -90,13 +141,36 @@ public class Player extends ParseObject implements java.io.Serializable {
         }
         mListeners.remove(listener);
     }
-    public static void setPlayers(List<Player> players) {
+    public static void setPlayers(List<Contestant> contestants) {
         try {
-            mPlayers = players;
+            mContestants = contestants;
         } catch (Exception e) {
-            Log.e(Player.class.getName(),"Unable to set players list", e);
+            Log.e(Contestant.class.getName(),"Unable to set contestants list", e);
         }
     }
+
+    //will indicate if is a team the contestant
+    public int getIsATeam()
+    {
+        //0 is false
+        //1 is true
+        return getInt(COLUMN.ISATEAM);
+    }
+
+    public void setIsATeam(int isATeam)
+    {
+        put(COLUMN.ISATEAM, isATeam);
+    }
+
+
+    public int getPoints(Contestant other) {
+        return getInt(COLUMN.POINTS + "." + other.getName());
+    }
+    public void setPoints(int points, Contestant other) {
+        put(COLUMN.POINTS + "." + other.getName(), points);
+    }
+
+
     public static boolean isRunningAQuery() {
         return mIsQueryRunning;
     }
@@ -138,46 +212,46 @@ public class Player extends ParseObject implements java.io.Serializable {
         try {
             useNetwork = preferences.getBoolean("cloud_sync", false);
         } catch (Exception e) {
-            Log.e("Player", "Couldn't load sync preference.", e);
+            Log.e("Contestant", "Couldn't load sync preference.", e);
         }
         queryPlayers(useNetwork);
     }
 
     public static void queryPlayers(final boolean useNetwork) {
         mIsQueryRunning = true;
-        final ParseQuery<Player> query = ParseQuery.getQuery("Player");
+        final ParseQuery<Contestant> query = ParseQuery.getQuery("Contestant");
         final SharedPreferences preferences = Preferences.getSharedPreferences();
         query.orderByAscending(COLUMN.NAME);
         if (!useNetwork) {
             query.fromLocalDatastore();
         }
         try {
-            query.findInBackground(new FindCallback<Player>() {
-                public void done(List<Player> playerList, ParseException parseException) {
+            query.findInBackground(new FindCallback<Contestant>() {
+                public void done(List<Contestant> contestantList, ParseException parseException) {
                     try {
                         if (parseException == null) {
                             if(useNetwork) {
                                 if(!preferences.getBoolean("cloud_keep_local", false)) {
                                     ParseObject.unpinAll(getPlayers()); // Remove old players
                                 }
-                                ParseObject.pinAllInBackground(playerList); // Pin players from net
+                                ParseObject.pinAllInBackground(contestantList); // Pin players from net
                             }
-                            setPlayers(playerList);
+                            setPlayers(contestantList);
                             notifyListeners();
-                            Log.d("Player", String.format("Found %s Player(s) from %s.", playerList.size(),
+                            Log.d("Contestant", String.format("Found %s Contestant(s) from %s.", contestantList.size(),
                                     useNetwork ? "the internet" : "local storage"));
                         } else {
-                            Log.d("Player", "Error: " + parseException.getMessage(), parseException);
+                            Log.d("Contestant", "Error: " + parseException.getMessage(), parseException);
                         }
                     } catch (Exception e) {
-                        Log.e("Player", "Error: Unable to handle query results", e);
+                        Log.e("Contestant", "Error: Unable to handle query results", e);
                     } finally {
                         mIsQueryRunning = false;
                     }
                 }
             });
         } catch (Exception e) {
-            Log.e("Player", "Error: Failed to execute query", e);
+            Log.e("Contestant", "Error: Failed to execute query", e);
         }
     }
 
@@ -186,29 +260,29 @@ public class Player extends ParseObject implements java.io.Serializable {
             for (PlayerListener listener:
                     mListeners) {
                 try {
-                    listener.notifyChange(mPlayers);
+                    listener.notifyChange(mContestants);
                 } catch (Exception e) {
-                    Log.e("Player", "Failed to notify change on: " + listener, e);
+                    Log.e("Contestant", "Failed to notify change on: " + listener, e);
                 }
             }
         }
     }
 
     public interface PlayerListener {
-        void notifyChange(List<Player> players);
+        void notifyChange(List<Contestant> contestants);
     }
 
-    public static class ListAdapter extends ArrayAdapter<Player>
+    public static class ListAdapter extends ArrayAdapter<Contestant>
     {
         private int mResource = android.R.layout.simple_list_item_activated_1;
         private int mTextViewResourceId = android.R.id.text1;
 
-        public ListAdapter(Context context, int resource, List<Player> objects) {
+        public ListAdapter(Context context, int resource, List<Contestant> objects) {
             super(context, resource, objects);
             mResource = resource;
         }
 
-        public ListAdapter(Context context, int resource, int textViewResourceId, List<Player> objects) {
+        public ListAdapter(Context context, int resource, int textViewResourceId, List<Contestant> objects) {
             super(context, resource, textViewResourceId, objects);
             mResource = resource;
             mTextViewResourceId = textViewResourceId;
@@ -224,7 +298,7 @@ public class Player extends ParseObject implements java.io.Serializable {
                 v = vi.inflate(mResource, null);
             }
 
-            Player p = getItem(position);
+            Contestant p = getItem(position);
 
             if (p != null) {
                 TextView tt1 = (TextView) v.findViewById(mTextViewResourceId);
@@ -240,14 +314,14 @@ public class Player extends ParseObject implements java.io.Serializable {
 
     @NonNull
     public AlertDialog.Builder getDeletePlayerDialog(Activity context) {
-        final Player player = this;
+        final Contestant contestant = this;
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(String.format(context.getString(R.string.player_delete_confirmation), getName()));
         builder.setPositiveButton(R.string.player_delete, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                player.doDelete();
+                contestant.doDelete();
             }
         });
         builder.setNegativeButton(R.string.cancel_delete, new DialogInterface.OnClickListener() {
@@ -260,30 +334,63 @@ public class Player extends ParseObject implements java.io.Serializable {
     }
 
     @NonNull
-    public static AlertDialog.Builder getNewPlayerDialog(Activity context) {
+    public static AlertDialog.Builder getNewPlayerDialog(Activity context, int isATeam)
+    {
+        String teamOrPlayer = DefineIfPlayerOrTeam(isATeam, context);
+
+        String title = context.getResources().getString(R.string.enter)  + teamOrPlayer + " "
+                + context.getResources().getString(R.string.name);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Enter Player Name");
-        setCreateOrRenameDialogButtons(builder, context, new Player(), "Add Player", "Cancel");
+        builder.setTitle(title);
+        setCreateOrRenameDialogButtons(builder, context, new Contestant(isATeam),
+                context.getResources().getString(R.string.add) + teamOrPlayer,
+                context.getResources().getString(R.string.cancel));
         return builder;
+    }
+
+    static String DefineIfPlayerOrTeam(int isATeam, Activity context)
+    {
+        if (Integer.compare(isATeam, 1) == 0)
+        {
+            return context.getResources().getString(R.string.team);
+        }
+        return context.getResources().getString(R.string.player);
+    }
+
+    /**
+     * For the current Instance of Contestant
+     * @return
+     */
+    public String DefineIfPlayerOrTeam(PlayerDetailFragment context)
+    {
+        if (Integer.compare(getIsATeam(), 1) == 0)
+        {
+            return context.getResources().getString(R.string.team);
+        }
+        return context.getResources().getString(R.string.player);
     }
 
     @NonNull
     public AlertDialog.Builder getRenamePlayerDialog(Activity context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(String.format("Rename \"%s\"", getName()));
-        setCreateOrRenameDialogButtons(builder, context, this, "Rename", "Don't rename");
+        builder.setTitle(String.format(context.getResources().getString(R.string.rename) +
+                " \"%s\"", getName()));
+        setCreateOrRenameDialogButtons(builder, context, this,
+                context.getResources().getString(R.string.rename),
+                context.getResources().getString(R.string.dont_rename));
         return builder;
     }
 
     private static void setCreateOrRenameDialogButtons(AlertDialog.Builder builder,
                                                        Activity context,
-                                                       final Player player,
+                                                       final Contestant contestant,
                                                        String positive,
                                                        String negative) {
         // Create the input view
         final EditText input = new EditText(context);
-        if (player.getName() != null) {
-            input.setText(player.getName());
+        if (contestant.getName() != null) {
+            input.setText(contestant.getName());
             input.selectAll();
         }
 
@@ -303,11 +410,11 @@ public class Player extends ParseObject implements java.io.Serializable {
                 Log.d(this.getClass().getName(), Integer.toBinaryString(keyCode));
                 if (keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
                     try {
-                        player.setName(input.getText().toString().trim());
-                        player.doSave();
+                        contestant.setName(input.getText().toString().trim());
+                        contestant.doSave();
                         dialog.dismiss();
                     } catch (Exception e) {
-                        Log.e(this.getClass().getName(), "Couldn't save player.", e);
+                        Log.e(this.getClass().getName(), "Couldn't save contestant.", e);
                     }
                     return false;
                 }
@@ -320,10 +427,10 @@ public class Player extends ParseObject implements java.io.Serializable {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-                    player.setName(input.getText().toString().trim());
-                    player.doSave();
+                    contestant.setName(input.getText().toString().trim());
+                    contestant.doSave();
                 } catch (Exception e) {
-                    Log.e(this.getClass().getName(), "Couldn't save player.", e);
+                    Log.e(this.getClass().getName(), "Couldn't save contestant.", e);
                 }
             }
         });
@@ -340,16 +447,16 @@ public class Player extends ParseObject implements java.io.Serializable {
     @NonNull
     public AlertDialog.Builder getPlayersDialog(Activity context,
                                                        DialogInterface.OnClickListener listener,
-                                                       List<Player> players) {
-        if (players == null) {
-            players = getPlayers();
+                                                       List<Contestant> contestants) {
+        if (contestants == null) {
+            contestants = getPlayers();
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         ListAdapter listAdapter = new ListAdapter(context,
-                android.R.layout.simple_list_item_activated_1, players);
+                android.R.layout.simple_list_item_activated_1, contestants);
         builder.setAdapter(listAdapter, listener);
-        builder.setTitle("Select an opponent");
+        builder.setTitle(context.getResources().getString(R.string.select_an_opponent));
         return builder;
     }
 
@@ -360,7 +467,7 @@ public class Player extends ParseObject implements java.io.Serializable {
                 public void done(ParseException parseException) {
                     try {
                         if (parseException == null) {
-                            Player.queryPlayers(false); // Update players
+                            Contestant.queryPlayers(false); // Update players
                         } else {
                             throw parseException;
                         }
@@ -384,29 +491,43 @@ public class Player extends ParseObject implements java.io.Serializable {
         }
     }
 
-    private void doDelete() {
-        unpinInBackground(new DeleteCallback() {
+    private void doDelete()
+    {
+        unpinInBackground(new DeleteCallback()
+        {
             @Override
-            public void done(ParseException parseException) {
-                try {
-                    if (parseException == null) {
-                        Player.queryPlayers(false); // Update players
-                    } else {
+            public void done(ParseException parseException)
+            {
+                try
+                {
+                    if (parseException == null)
+                    {
+                        deleteFromAllPlayers();
+                        Contestant.queryPlayers(false); // Update players
+                    }
+                    else
+                    {
                         throw parseException;
                     }
                 } catch (ParseException e) {
-                    Log.e("Player", "Player could not be deleted locally", e);
+                    Log.e("Contestant", "Contestant could not be deleted locally", e);
                 }
             }
         });
 
-        if (Preferences.getSharedPreferences().getBoolean("cloud_sync", false)) {
-            deleteEventually(new DeleteCallback() {
+        if (Preferences.getSharedPreferences().getBoolean("cloud_sync", false))
+        {
+            deleteEventually(new DeleteCallback()
+            {
                 @Override
-                public void done(ParseException e) {
-                    if (e != null) {
-                        Log.e("Player", "Player could not be deleted remotely", e);
+                public void done(ParseException e)
+                {
+                    if (e != null)
+                    {
+                        Log.e("Contestant", "Contestant could not be deleted remotely", e);
                     }
+                    else
+                        deleteFromAllPlayers();
                 }
             });
         }

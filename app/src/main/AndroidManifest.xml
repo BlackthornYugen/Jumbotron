@@ -52,16 +52,6 @@
             android:label="@string/title_activity_game_emulator"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
-        <activity
-            android:name=".ListTeamsActivity"
-            android:label="@string/title_activity_list_teams"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
-        <activity
-            android:name=".TeamDetailActivity"
-            android:label="@string/title_activity_team_detail"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
     </application>
 
 </manifest>

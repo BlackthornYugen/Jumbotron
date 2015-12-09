@@ -10,12 +10,12 @@ Created by John Steel on 2015-11-01 from a template.
     <SwitchPreference
         android:key="cloud_sync"
         android:title="Sync to Cloud"
-        android:summary="Synchronize your players and scores to the internet."
+        android:summary="Synchronize your contestants and scores to the internet."
         android:defaultValue="false" />
 
     <SwitchPreference
         android:key="cloud_keep_local"
-        android:title="Keep local players"
+        android:title="Keep local contestants"
         android:summary="Don't delete local data if it no longer exists online."
         android:defaultValue="false" />
 
