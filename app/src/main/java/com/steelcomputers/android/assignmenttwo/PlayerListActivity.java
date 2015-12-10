@@ -109,6 +109,15 @@ public class PlayerListActivity extends AppCompatActivity
             }
         });
 
+        FloatingActionButton fabDeleteAllPlayers = (FloatingActionButton) findViewById(R.id.fabDeleteAllPlayer);
+        fabDeleteAllPlayers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Contestant.deleteAllPlayers();
+                Toast.makeText(context, getResources().getString(R.string.all_players_deleted), Toast.LENGTH_LONG).show();
+            }
+        });
+
 
 
         try {

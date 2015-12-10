@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
@@ -83,7 +84,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
      * other contestants. So if a new player in the future has the same key
      * will start with zero.
      *
-     * Could be improved just deleting the key
+     * Could be improved just deleting the column on the DB
      */
     void deleteFromAllPlayers()
     {
@@ -164,10 +165,10 @@ public class Contestant extends ParseObject implements java.io.Serializable {
 
 
     public int getPoints(Contestant other) {
-        return getInt(COLUMN.POINTS + "." + other.getName());
+        return getInt(COLUMN.POINTS + "_" + other.getName());
     }
     public void setPoints(int points, Contestant other) {
-        put(COLUMN.POINTS + "." + other.getName(), points);
+        put(COLUMN.POINTS + "_" + other.getName(), points);
     }
 
 
@@ -214,6 +215,9 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         } catch (Exception e) {
             Log.e("Contestant", "Couldn't load sync preference.", e);
         }
+
+        String msg = "useNetwork " + useNetwork;
+        Log.d("",msg);
         queryPlayers(useNetwork);
     }
 
@@ -383,9 +387,9 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     }
 
     private static void setCreateOrRenameDialogButtons(AlertDialog.Builder builder,
-                                                       Activity context,
+                                                       final Activity context,
                                                        final Contestant contestant,
-                                                       String positive,
+                                                       final String positive,
                                                        String negative) {
         // Create the input view
         final EditText input = new EditText(context);
@@ -427,8 +431,27 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-                    contestant.setName(input.getText().toString().trim());
-                    contestant.doSave();
+
+                    boolean isValidName = isValidInputName(input.getText().toString());
+
+                    if (isValidName)
+                    {
+                        contestant.setName(input.getText().toString().trim());
+                        contestant.doSave();
+                    }
+                    else
+                    {
+                        dialog.cancel();
+                        Toast.makeText(context,
+                                context.getResources().getString(R.string.new_name_invalid), Toast.LENGTH_LONG).show();
+
+                        //if is adding and went wrong then needs to be deleted
+                        if (positive.contains(context.getResources().getString(R.string.add)))
+                        {
+                            contestant.doDelete();
+                        }
+                    }
+
                 } catch (Exception e) {
                     Log.e(this.getClass().getName(), "Couldn't save contestant.", e);
                 }
@@ -443,6 +466,35 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             }
         });
     }
+
+    /**
+     * Will make sure the input new name is not empty and doestn exist already
+     * @param newName
+     * @return
+     */
+    static boolean isValidInputName(String newName)
+    {
+        if (newName.equals(null) || newName.trim().equals(""))
+        {
+            return false;
+        }
+
+        for (int i = 0; i < mContestants.size(); i++) {
+            if (newName.trim().equals(mContestants.get(i).getName()))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void deleteAllPlayers()
+    {
+        for (int i = 0; i < mContestants.size(); i++) {
+            mContestants.get(i).doDelete();
+        }
+    }
+
 
     @NonNull
     public AlertDialog.Builder getPlayersDialog(Activity context,
