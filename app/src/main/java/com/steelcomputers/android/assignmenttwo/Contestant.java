@@ -84,7 +84,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
      * other contestants. So if a new player in the future has the same key
      * will start with zero.
      *
-     * Could be improved just deleting the key
+     * Could be improved just deleting the column on the DB
      */
     void deleteFromAllPlayers()
     {
@@ -486,6 +486,13 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             }
         }
         return true;
+    }
+
+    public static void deleteAllPlayers()
+    {
+        for (int i = 0; i < mContestants.size(); i++) {
+            mContestants.get(i).doDelete();
+        }
     }
 
 

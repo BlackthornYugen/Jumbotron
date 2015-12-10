@@ -35,6 +35,11 @@ Created by John Steel on 2015-10-31 from a template.
         android:layout_margin="@dimen/fab_margin" android:src="@android:drawable/ic_menu_add"
         android:layout_gravity="bottom|start" />
 
+    <android.support.design.widget.FloatingActionButton android:id="@+id/fabDeleteAllPlayer"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin" android:src="@android:drawable/ic_menu_delete"
+        android:layout_gravity="bottom|center" />
+
     <android.support.design.widget.FloatingActionButton android:id="@+id/fabAddPlayer"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin" android:src="@android:drawable/ic_input_add"
