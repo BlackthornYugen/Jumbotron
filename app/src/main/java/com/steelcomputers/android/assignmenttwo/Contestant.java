@@ -389,7 +389,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     private static void setCreateOrRenameDialogButtons(AlertDialog.Builder builder,
                                                        final Activity context,
                                                        final Contestant contestant,
-                                                       String positive,
+                                                       final String positive,
                                                        String negative) {
         // Create the input view
         final EditText input = new EditText(context);
@@ -437,16 +437,20 @@ public class Contestant extends ParseObject implements java.io.Serializable {
                     if (isValidName)
                     {
                         contestant.setName(input.getText().toString().trim());
+                        contestant.doSave();
                     }
                     else
                     {
                         dialog.cancel();
                         Toast.makeText(context,
                                 context.getResources().getString(R.string.new_name_invalid), Toast.LENGTH_LONG).show();
-                        mContestants.remove(contestant);//removes the recently added constestant
+
+                        //if is adding and went wrong then needs to be deleted
+                        if (positive.contains(context.getResources().getString(R.string.add)))
+                        {
+                            contestant.doDelete();
+                        }
                     }
-                    contestant.doDelete();
-                    contestant.doSave();
 
                 } catch (Exception e) {
                     Log.e(this.getClass().getName(), "Couldn't save contestant.", e);
