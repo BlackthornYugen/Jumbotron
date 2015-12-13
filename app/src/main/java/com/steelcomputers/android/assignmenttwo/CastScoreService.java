@@ -32,6 +32,8 @@ public class CastScoreService extends Service implements Contestant.GameListener
     private boolean mApplicationStarted;
     private boolean mWaitingForReconnect;
     private String mSessionId;
+    private Contestant mAway;
+    private Contestant mHome;
 
     public CastScoreService() {
         Log.d(TAG, "Started");
@@ -45,6 +47,17 @@ public class CastScoreService extends Service implements Contestant.GameListener
     @Override
     public void score(int homeScore, int awayScore) {
         sendMessage(String.format("%d to %d", homeScore, awayScore));
+    }
+
+    @Override
+    public void score(String id, int score) {
+        String playerName;
+        if (mHome.getId() == id) {
+            playerName = mHome.getName(true);
+        } else {
+            playerName = mAway.getName(true);
+        }
+        sendMessage(String.format("%s has %d points!", playerName, score));
     }
 
     public class ScoreBinder extends Binder {
@@ -80,8 +93,18 @@ public class CastScoreService extends Service implements Contestant.GameListener
         }
 
         public void watchGame(Contestant home, Contestant away) {
-            Contestant.addListener(CastScoreService.this, home, away); // TODO: Fix leaky listener
-            //Contestant.removeListener(CastScoreService.this, mWatchedGame.home, mWatchedGame.away);
+            if (mHome != null && mAway != null) { // Remove old listeners
+                Contestant.removeListener(CastScoreService.this, away, home);
+                Contestant.removeListener(CastScoreService.this, home, away);
+            }
+
+            // Add new listeners
+            Contestant.addListener(CastScoreService.this, home, away);
+            Contestant.addListener(CastScoreService.this, away, home);
+
+            // Store player references, TODO: Consider weak refs
+            mHome = home;
+            mAway = away;
         }
     }
 
@@ -90,7 +113,6 @@ public class CastScoreService extends Service implements Contestant.GameListener
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         teardown(true);
-        //Contestant.removeListener(this, mWatchedGame.home, mWatchedGame.away);
         super.onDestroy();
     }
 
@@ -203,6 +225,10 @@ public class CastScoreService extends Service implements Contestant.GameListener
                                                 // set the initial instructions
                                                 // on the receiver
                                                 sendMessage("App Connected");
+
+                                                // Ask for an update
+                                                mHome.notifyGameListeners(mAway);
+                                                mAway.notifyGameListeners(mHome);
                                             } else {
                                                 Log.e(TAG, "application could not launch");
                                                 teardown(true);

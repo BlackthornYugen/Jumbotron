@@ -64,7 +64,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     }
 
     /**
-     * The action of lossing a point to the contestant
+     * The action of loosing a point to the contestant
      */
     public void minusPoint(Contestant other)
     {
@@ -74,12 +74,16 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     }
 
     /**
-     * The action of reseting a game
-     * @param other The specific game will be reseted
+     * The action of resetting a game
+     * @param other The specific game will be reset
      */
     public void resetGame(Contestant other)
     {
         setPoints(0, other);
+    }
+
+    public void notifyGameListeners(Contestant other) {
+        notifyListeners(this, other);
     }
 
     /**
@@ -223,6 +227,8 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         return mIsQueryRunning;
     }
     public String getId() {
+        if (mID == null)
+            return getObjectId();
         return mID;
     }
     public void setId(String id) {
@@ -331,13 +337,13 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         }
     }
 
-    private static void notifyListeners(Contestant home, Contestant away) {
-        List<GameListener> gameListeners = mGameListeners.get(home.getName() + away.getName());
+    private static void notifyListeners(Contestant c1, Contestant c2) {
+        List<GameListener> gameListeners = mGameListeners.get(c1.getName() + c2.getName());
         if(gameListeners != null) {
             for (GameListener listener:
                     gameListeners) {
                 try {
-                    listener.score(home.getPoints(away), away.getPoints(home));
+                    listener.score(c1.getId(), c1.getPoints(c2));
                 } catch (Exception e) {
                     Log.e("Contestant", "Failed to update score on: " + listener, e);
                 }
@@ -351,6 +357,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
 
     public interface GameListener {
         void score(int homeScore, int awayScore);
+        void score(String id, int score);
     }
 
     public static class ListAdapter extends ArrayAdapter<Contestant>
