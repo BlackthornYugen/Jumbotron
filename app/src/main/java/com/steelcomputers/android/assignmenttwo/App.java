@@ -1,6 +1,7 @@
 package com.steelcomputers.android.assignmenttwo;
 
 import android.app.Application;
+import android.content.Intent;
 import android.util.Log;
 
 import com.parse.Parse;
@@ -25,6 +26,13 @@ public class App extends Application {
             Log.d("App", "Parse library initialized");
         } catch (Exception e) {
             Log.e("App", "Failed to initialize parse library.", e);
+        }
+
+        try {
+            startService(new Intent(this, CastScoreService.class));
+            Log.d("App", "Score cast service initialized");
+        } catch (Exception e) {
+            Log.e("App", "Failed to initialize score cast service", e);
         }
 
         try {

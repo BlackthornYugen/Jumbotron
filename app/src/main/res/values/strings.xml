@@ -62,4 +62,5 @@ Created by John Steel on 2015-10-31.
     <!-- Cast Related -->
     <string name="app_id">89D813CD</string>
     <string name="namespace">urn:x-cast:com.steelcomputers.cast.jumbotron</string>
+    <string name="cast_to_device">Cast to Device</string>
 </resources>

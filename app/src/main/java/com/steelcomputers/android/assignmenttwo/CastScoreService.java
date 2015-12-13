@@ -39,10 +39,10 @@ public class CastScoreService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return new ICastMessageService();
+        return new ScoreBinder();
     }
 
-    public class ICastMessageService extends Binder {
+    public class ScoreBinder extends Binder {
         public void sendMessage(String message) {
             Log.d(TAG, "sendMessage: " + message);
             CastScoreService.this.sendMessage(message);
