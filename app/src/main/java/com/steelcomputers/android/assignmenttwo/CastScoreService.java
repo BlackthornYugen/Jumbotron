@@ -63,6 +63,11 @@ public class CastScoreService extends Service implements Contestant.GameListener
             Log.d(TAG, String.format("teardown with param %s", selectDefaultRoute));
             CastScoreService.this.teardown(selectDefaultRoute);
         }
+
+        public void watchGame(Contestant home, Contestant away) {
+            Contestant.addListener(CastScoreService.this, home, away); // TODO: Fix leaky listener
+            //Contestant.removeListener(CastScoreService.this, mWatchedGame.home, mWatchedGame.away);
+        }
     }
 
     // Much of the code below was borrowed //
@@ -70,6 +75,7 @@ public class CastScoreService extends Service implements Contestant.GameListener
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         teardown(true);
+        //Contestant.removeListener(this, mWatchedGame.home, mWatchedGame.away);
         super.onDestroy();
     }
 

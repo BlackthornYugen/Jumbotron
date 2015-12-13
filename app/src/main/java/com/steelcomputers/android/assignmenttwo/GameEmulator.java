@@ -30,42 +30,36 @@ import com.google.android.gms.cast.CastMediaControlIntent;
  */
 public class GameEmulator extends AppCompatActivity {
     private static final String TAG = GameEmulator.class.getSimpleName();
-    private CastScoreService.ScoreBinder mCastService;
     private MediaRouteSelector mMediaRouteSelector;
     private MediaRouter mMediaRouter;
     private MediaRouter.Callback mRouteCallbacks;
+    private int mHomeIndex = 0;
+    private int mAwayIndex = 0;
     private boolean mBindingInProgress;
+    private ServiceConnection mServiceConnection;
+    private boolean mBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mHomeIndex = getIntent().getIntExtra(GameEmulatorFragment.ARG_PLAYER_ONE, 0);
+        mAwayIndex = getIntent().getIntExtra(GameEmulatorFragment.ARG_PLAYER_TWO, 0);
+
         tryBindCastService();
         try {
             setContentView(R.layout.activity_game_emulator);
             Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
             setSupportActionBar(toolbar);
 
-            //   Show the Up button in the action bar.
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-            // savedInstanceState is non-null when there is fragment state
-            // saved from previous configurations of this activity
-            // (e.g. when rotating the screen from portrait to landscape).
-            // In this case, the fragment will automatically be re-added
-            // to its container so we don't need to manually add it.
-            // For more information, see the Fragments API guide at:
-            //
-            // http://developer.android.com/guide/components/fragments.html
-            //
             if (savedInstanceState == null) {
                 // Create the detail fragment and add it to the activity
                 // using a fragment transaction.
                 Bundle arguments = new Bundle();
-                arguments.putBinder(GameEmulatorFragment.ARG_CAST_SERVICE, mCastService);
-                arguments.putInt(GameEmulatorFragment.ARG_PLAYER_ONE,
-                        getIntent().getIntExtra(GameEmulatorFragment.ARG_PLAYER_ONE, 0));
-                arguments.putInt(GameEmulatorFragment.ARG_PLAYER_TWO,
-                        getIntent().getIntExtra(GameEmulatorFragment.ARG_PLAYER_TWO, 0));
+                arguments.putInt(GameEmulatorFragment.ARG_PLAYER_ONE, mHomeIndex);
+                arguments.putInt(GameEmulatorFragment.ARG_PLAYER_TWO, mAwayIndex);
                 GameEmulatorFragment fragment = new GameEmulatorFragment();
                 fragment.setArguments(arguments);
                 getSupportFragmentManager().beginTransaction()
@@ -127,54 +121,60 @@ public class GameEmulator extends AppCompatActivity {
     }
 
     private void tryBindCastService() {
-        if(mBindingInProgress || mCastService != null) {
+        if(mBindingInProgress) {
             return; // Don't try to bind if a bind is pending or if already bound
         }
         mBindingInProgress = true;
+        mServiceConnection = new ServiceConnection() {
+                    private CastScoreService.ScoreBinder mCastService;
+
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        mBound = true;
+                        Log.d(TAG, "onServiceConnected");
+                        mCastService = (CastScoreService.ScoreBinder) service;
+                        mBindingInProgress = false;
+                        mRouteCallbacks = new MediaRouter.Callback() {
+                            @Override
+                            public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo route) {
+                                super.onRouteSelected(router, route);
+                                Log.d(TAG, "onRouteSelected");
+                                // Handle the user route selection.
+                                if( mCastService != null) {
+                                    mCastService.launchReceiver(CastDevice.getFromBundle(route.getExtras()));
+                                    mCastService.watchGame(
+                                            Contestant.getPlayers().get(mHomeIndex),
+                                            Contestant.getPlayers().get(mAwayIndex));
+                                }
+                            }
+
+                            @Override
+                            public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo route) {
+                                super.onRouteUnselected(router, route);
+                                Log.d(TAG, "onRouteUnselected: info=" + route);
+                                if(mCastService!= null) {
+                                    mCastService.teardown(false);
+                                }
+                            }
+                        };
+
+                        // Start media router discovery
+                        mMediaRouter.addCallback(
+                                mMediaRouteSelector,
+                                mRouteCallbacks,
+                                MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+                        mBound = false;
+                        mCastService = null;
+                        Log.d(TAG, "onServiceDisconnected");
+                    }
+                };
         try {
-            bindService(
-                    new Intent(GameEmulator.this, CastScoreService.class),
-                    new ServiceConnection() {
-                        @Override
-                        public void onServiceConnected(ComponentName name, IBinder service) {
-                            Log.d(TAG, "onServiceConnected");
-                            mCastService = (CastScoreService.ScoreBinder) service;
-                            mBindingInProgress = false;
-                            mRouteCallbacks = new MediaRouter.Callback() {
-                                @Override
-                                public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo route) {
-                                    super.onRouteSelected(router, route);
-                                    Log.d(TAG, "onRouteSelected");
-                                    // Handle the user route selection.
-                                    if( mCastService != null) {
-                                        mCastService.launchReceiver(CastDevice.getFromBundle(route.getExtras()));
-                                    }
-                                }
-
-                                @Override
-                                public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo route) {
-                                    super.onRouteUnselected(router, route);
-                                    Log.d(TAG, "onRouteUnselected: info=" + route);
-                                    if(mCastService!= null) {
-                                        mCastService.teardown(false);
-                                    }
-                                }
-                            };
-
-                            // Start media router discovery
-                            mMediaRouter.addCallback(
-                                    mMediaRouteSelector,
-                                    mRouteCallbacks,
-                                    MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
-                        }
-
-                        @Override
-                        public void onServiceDisconnected(ComponentName name) {
-                            Log.d(TAG, "onServiceDisconnected");
-                            mCastService = null;
-                        }
-                    },
-                    Context.BIND_AUTO_CREATE);
+            Intent intent = new Intent(GameEmulator.this, CastScoreService.class);
+            bindService( intent, mServiceConnection, Context.BIND_AUTO_CREATE);
         } catch (Exception e) {
             Log.e(TAG, "tryBindCastService: failed to bind", e);
             mBindingInProgress = false;
@@ -184,7 +184,9 @@ public class GameEmulator extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mCastService = null;
+        if (mBound) {
+            unbindService(mServiceConnection);
+        }
         mRouteCallbacks = null;
     }
 }
