@@ -3,12 +3,14 @@ package com.steelcomputers.android.assignmenttwo;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.media.MediaRouter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.steelcomputers.android.assignmenttwo.CastScoreService.ScoreBinder;
 
 import java.util.List;
 
@@ -25,12 +27,14 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
     public static final String ARG_PLAYER_ONE = "player_one";
     public static final String ARG_PLAYER_TWO = "player_two";
     public static final String ARG_STATE_SAVED = "state_saved";
+    public static final String ARG_CAST_SERVICE = "cast_service";
     private Contestant[] mContestant = new Contestant[2];
     private Button[] mBtnScore = new Button[2];
     private Button[] mBtnMinus = new Button[2];
 
     private Button mBtnResetGame;
     private Button mBtnStartFromScratch;
+    private ScoreBinder mCastService;
 
     private TextView[] mTxtName;
     private TextView[] mTxtPoints;
@@ -45,12 +49,16 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
         if ( savedInstanceState != null && savedInstanceState.getBoolean(ARG_STATE_SAVED)) {
             mContestant[0] = (Contestant) savedInstanceState.getSerializable(ARG_PLAYER_ONE);
             mContestant[1] = (Contestant) savedInstanceState.getSerializable(ARG_PLAYER_TWO);
+            mCastService = (ScoreBinder) savedInstanceState.getBinder(ARG_CAST_SERVICE);
         } else {
             if (getArguments().containsKey(ARG_PLAYER_ONE)) {
                 mContestant[0] = Contestant.getPlayers().get(getArguments().getInt(ARG_PLAYER_ONE));
             }
             if (getArguments().containsKey(ARG_PLAYER_TWO)) {
                 mContestant[1] = Contestant.getPlayers().get(getArguments().getInt(ARG_PLAYER_TWO));
+            }
+            if (getArguments().containsKey(ARG_CAST_SERVICE)) {
+                mCastService = (ScoreBinder) getArguments().getBinder(ARG_CAST_SERVICE);
             }
         }
     }
@@ -173,6 +181,7 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
         outState.putBoolean(ARG_STATE_SAVED, true);
         outState.putSerializable(ARG_PLAYER_ONE, mContestant[0]);
         outState.putSerializable(ARG_PLAYER_TWO, mContestant[1]);
+        outState.putBinder(ARG_CAST_SERVICE, mCastService);
     }
 
     private void setViewValues() {
@@ -196,6 +205,18 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
 
         } catch (Exception e) {
             android.util.Log.e(getClass().getName(), "Failed to set fragment values", e);
+        }
+
+        if (mCastService != null) {
+            try {
+                mCastService.sendMessage(String.format("%s vs %s\n%d | %d",
+                        mContestant[0].getName(),
+                        mContestant[0].getName(),
+                        mContestant[0].getPoints(mContestant[1]),
+                        mContestant[1].getPoints(mContestant[0])));
+            } catch (Exception e) {
+                android.util.Log.e(getClass().getName(), "Failed to set cast values", e);
+            }
         }
     }
 

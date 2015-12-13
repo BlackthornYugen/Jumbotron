@@ -27,6 +27,8 @@ import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -120,6 +122,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
 
     private static List<Contestant> mContestants = new ArrayList<Contestant>();
     private static List<PlayerListener> mListeners = new ArrayList<PlayerListener>();
+    private static Dictionary<GameListener, String> mGameListeners = new Hashtable<>();
     private static boolean mIsQueryRunning         = false;
     private String mID;
 
@@ -141,6 +144,12 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             mListeners = new LinkedList<PlayerListener>();
         }
         mListeners.remove(listener);
+    }
+    public static void addGameListener(GameListener listener, String opponent) {
+        mGameListeners.put(listener, opponent);
+    }
+    public static void removeListener(GameListener listener) {
+        mGameListeners.remove(listener);
     }
     public static void setPlayers(List<Contestant> contestants) {
         try {
@@ -170,8 +179,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     public void setPoints(int points, Contestant other) {
         put(COLUMN.POINTS + "_" + other.getName(), points);
     }
-
-
+    
     public static boolean isRunningAQuery() {
         return mIsQueryRunning;
     }
@@ -274,6 +282,10 @@ public class Contestant extends ParseObject implements java.io.Serializable {
 
     public interface PlayerListener {
         void notifyChange(List<Contestant> contestants);
+    }
+
+    public interface GameListener {
+        void score(int player, int opponent);
     }
 
     public static class ListAdapter extends ArrayAdapter<Contestant>
