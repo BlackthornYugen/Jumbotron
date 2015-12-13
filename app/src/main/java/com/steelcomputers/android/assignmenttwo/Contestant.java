@@ -80,6 +80,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     public void resetGame(Contestant other)
     {
         setPoints(0, other);
+        notifyGameListeners(other);
     }
 
     public void notifyGameListeners(Contestant other) {
@@ -242,7 +243,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
      */
     public String getName(boolean withIdentIcon) {
         if (withIdentIcon) {
-            return (isATeam() ? "\uD83D\uDC65" : "\uD83D\uDC64") + getName();
+            return (isATeam() ? "\uD83D\uDC65 " : "\uD83D\uDC64 ") + getName();
         }
         return getName();
     }

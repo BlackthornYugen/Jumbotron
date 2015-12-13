@@ -1,102 +1,136 @@
-<!--
-Copyright (C) 2014 Google Inc. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
 <!DOCTYPE html>
 <html>
   <head>
+	<script src="https://code.jquery.com/jquery.min.js"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <style type="text/css">
-	  body {
-	    overflow:hidden;
-	  }
-      div{
-	    height:720PX;
-	    width:1280PX;
-	    text-align:center;
-	    border:0px solid silver;
-	    display: table-cell;
-	    vertical-align:middle;
-	    color:#FFFFFF;
-	    background-color:#333333;
-	    font-weight:bold;
-	    font-family:Verdana, Geneva, sans-serif;
-	    font-size:40px;
-	}
+		.row, .container-fluid {
+			flex: 1;
+		}
+
+		.score { font-size: 5em; font-weight: 800 }
+
+		.player1, .player2 {color: red; text-align: center; }
+		.player2 {color: blue;}
+
+
+		html, body {
+			height: 100%;
+		}
+
+		.Aligner {
+			height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
     </style>
-    <title>Cast Hello Text</title>
+    <title>Jumbotron</title>
   </head>
   <body>
-	<DIV id="message">Talk to me</DIV>
+	<div class="Aligner">
+	  <div class="container-fluid">
+		  <div class="row">
+			  <div class="col-xs-6 player1">
+				  <h1>Player One</h1>
+			  </div>
+			  <div class="col-xs-6 player2">
+				  <h1>Player Two</h1>
+			  </div>
+		  </div>
+		  <div class="row">
+			  <div class="col-xs-6 score player1">
+				  0
+			  </div>
+			  <div class="col-xs-6 score player2">
+				  0
+			  </div>
+		  </div>
+	  </div>
+	</div>
     <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
     <script type="text/javascript">
-      window.onload = function() {
-        cast.receiver.logger.setLevelValue(0);
-        window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-        console.log('Starting Receiver Manager');
-        
-        // handler for the 'ready' event
-        castReceiverManager.onReady = function(event) {
-          console.log('Received Ready event: ' + JSON.stringify(event.data));
-          window.castReceiverManager.setApplicationState("Application status is ready...");
-        };
-        
-        // handler for 'senderconnected' event
-        castReceiverManager.onSenderConnected = function(event) {
-          console.log('Received Sender Connected event: ' + event.data);
-          console.log(window.castReceiverManager.getSender(event.data).userAgent);
-        };
-        
-        // handler for 'senderdisconnected' event
-        castReceiverManager.onSenderDisconnected = function(event) {
-          console.log('Received Sender Disconnected event: ' + event.data);
-          if (window.castReceiverManager.getSenders().length == 0) {
-	        window.close();
-	      }
-        };
-        
-        // handler for 'systemvolumechanged' event
-        castReceiverManager.onSystemVolumeChanged = function(event) {
-          console.log('Received System Volume Changed event: ' + event.data['level'] + ' ' +
-              event.data['muted']);
-        };
+		window.onload = function() {
+			cast.receiver.logger.setLevelValue(0);
+			window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+			console.log('Starting Receiver Manager');
 
-        // create a CastMessageBus to handle messages for a custom namespace
-        window.messageBus =
-          window.castReceiverManager.getCastMessageBus(
-              'urn:x-cast:com.steelcomputers.cast.jumbotron');
+			// handler for the 'ready' event
+			castReceiverManager.onReady = function(event) {
+				console.log('Received Ready event: ' + JSON.stringify(event.data));
+				window.castReceiverManager.setApplicationState("Application status is ready...");
+			};
 
-        // handler for the CastMessageBus message event
-        window.messageBus.onMessage = function(event) {
-          console.log('Message [' + event.senderId + ']: ' + event.data);
-          // display the message from the sender
-          displayText(event.data);
-          // inform all senders on the CastMessageBus of the incoming message event
-          // sender message listener will be invoked
-          window.messageBus.send(event.senderId, event.data);
-        }
+			// handler for 'senderconnected' event
+			castReceiverManager.onSenderConnected = function(event) {
+				console.log('Received Sender Connected event: ' + event.data);
+				console.log(window.castReceiverManager.getSender(event.data).userAgent);
+			};
 
-        // initialize the CastReceiverManager with an application status message
-        window.castReceiverManager.start({statusText: "Application is starting"});
-        console.log('Receiver Manager started');
-      };
-      
-      // utility function to display the text message in the input field
-      function displayText(text) {
-        console.log(text);
-        document.getElementById("message").innerHTML=text;
-        window.castReceiverManager.setApplicationState(text);
-      };
+			// handler for 'senderdisconnected' event
+			castReceiverManager.onSenderDisconnected = function(event) {
+				console.log('Received Sender Disconnected event: ' + event.data);
+				if (window.castReceiverManager.getSenders().length == 0) {
+					window.close();
+				}
+			};
+
+			// handler for 'systemvolumechanged' event
+			castReceiverManager.onSystemVolumeChanged = function(event) {
+				console.log('Received System Volume Changed event: ' + event.data['level'] + ' ' +
+				event.data['muted']);
+			};
+
+			// create a CastMessageBus to handle messages for a custom namespace
+			window.messageBus =
+					window.castReceiverManager.getCastMessageBus(
+							'urn:x-cast:com.steelcomputers.cast.jumbotron');
+
+			// handler for the CastMessageBus message event
+			window.messageBus.onMessage = function(event) {
+				console.log('Message [' + event.senderId + ']: ' + event.data);
+				// display the message from the sender
+
+				// Commands are in the format {property}/{player}/{value}
+				var command = event.data.split("/");
+
+				switch (command[0]) {
+					case "name":
+						playerName(command[1], command[2]);
+						break;
+					case "score":
+						playerScore(command[1], command[2]);
+						break;
+					default:
+						console.log("Unknown command \"%s\"", command[0]);
+				}
+
+				// inform all senders on the CastMessageBus of the incoming message event
+				// sender message listener will be invoked
+				window.messageBus.send(event.senderId, event.data);
+			}
+
+			// initialize the CastReceiverManager with an application status message
+			window.castReceiverManager.start({statusText: "Application is starting"});
+			console.log('Receiver Manager started');
+		};
+
+		// set a player's name
+		function playerName(index, name) {
+			var selection = document.querySelector(".player" + index + " h1");
+			console.log("Changing player %s name from %s to %s", index, selection.innerText, name);
+			selection.innerText = name;
+			window.castReceiverManager.setApplicationState(name);
+		};
+
+		// set a player's score
+		function playerScore(index, score) {
+			var selection = document.querySelector(".player" + index + ".score");
+			console.log("Player %s score changed from %s to %s", index, selection.innerText	, score);
+			selection.innerText = score;
+			window.castReceiverManager.setApplicationState(score);
+		};
     </script>
   </body>
 </html>

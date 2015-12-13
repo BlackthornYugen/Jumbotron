@@ -49,18 +49,30 @@ public class CastScoreService extends Service implements Contestant.GameListener
         sendMessage(String.format("%d to %d", homeScore, awayScore));
     }
 
+    /**
+     * Set the score of a player
+     * @param id the player id
+     * @param score the player's score
+     */
     @Override
     public void score(String id, int score) {
         String playerName;
-        if (mHome.getId() == id) {
+        boolean isHomePlayer = mHome.getId() == id;
+        int playerIndex = isHomePlayer ? 1 : 2;
+        if (isHomePlayer) {
             playerName = mHome.getName(true);
         } else {
             playerName = mAway.getName(true);
         }
-        sendMessage(String.format("%s has %d points!", playerName, score));
+        sendMessage(String.format("name/%d/%s", playerIndex, playerName));
+        sendMessage(String.format("score/%d/%s", playerIndex, score));
     }
 
     public class ScoreBinder extends Binder {
+        /**
+         * Send a raw message to the chromecast
+         * @param message the message to send
+         */
         public void sendMessage(String message) {
             Log.d(TAG, "sendMessage: " + message);
             CastScoreService.this.sendMessage(message);
