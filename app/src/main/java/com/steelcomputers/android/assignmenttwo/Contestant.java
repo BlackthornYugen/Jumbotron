@@ -69,6 +69,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     public void minusPoint(Contestant other)
     {
         setPoints(getPoints(other) - 1, other);
+        notifyListeners(this, other);
         doSave();
     }
 
@@ -193,6 +194,10 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         }
     }
 
+    public boolean isATeam() {
+        return getIsATeam() == 1;
+    }
+
     //will indicate if is a team the contestant
     public int getIsATeam()
     {
@@ -222,6 +227,18 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     }
     public void setId(String id) {
         mID = id;
+    }
+
+    /**
+     * Get a players name prefixed with player/team badge
+     * @param withIdentIcon true to prefix with badge icon
+     * @return string name with optional badge
+     */
+    public String getName(boolean withIdentIcon) {
+        if (withIdentIcon) {
+            return (isATeam() ? "\uD83D\uDC65" : "\uD83D\uDC64") + getName();
+        }
+        return getName();
     }
     public String getName() {
         return getString(COLUMN.NAME);
@@ -368,7 +385,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
                 TextView tt1 = (TextView) v.findViewById(mTextViewResourceId);
 
                 if (tt1 != null) {
-                    tt1.setText(p.getName());
+                    tt1.setText(p.getName(true));
                 }
             }
 
