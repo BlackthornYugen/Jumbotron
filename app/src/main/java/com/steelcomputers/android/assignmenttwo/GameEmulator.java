@@ -30,14 +30,13 @@ import com.google.android.gms.cast.CastMediaControlIntent;
  */
 public class GameEmulator extends AppCompatActivity {
     private static final String TAG = GameEmulator.class.getSimpleName();
+    private CastScoreService.ScoreBinder mCastService;
     private MediaRouteSelector mMediaRouteSelector;
     private MediaRouter mMediaRouter;
     private MediaRouter.Callback mRouteCallbacks;
     private int mHomeIndex = 0;
     private int mAwayIndex = 0;
-    private boolean mBindingInProgress;
     private ServiceConnection mServiceConnection;
-    private boolean mBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +45,6 @@ public class GameEmulator extends AppCompatActivity {
         mHomeIndex = getIntent().getIntExtra(GameEmulatorFragment.ARG_PLAYER_ONE, 0);
         mAwayIndex = getIntent().getIntExtra(GameEmulatorFragment.ARG_PLAYER_TWO, 0);
 
-        tryBindCastService();
         try {
             setContentView(R.layout.activity_game_emulator);
             Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
@@ -73,8 +71,47 @@ public class GameEmulator extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        super.onStart();
-        tryBindCastService();
+        super.onStart();        // Bind cast service
+        mServiceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                Log.d(TAG, "onServiceConnected");
+                mCastService = (CastScoreService.ScoreBinder) service;
+
+                // Start media router discovery
+                mMediaRouter.addCallback(
+                        mMediaRouteSelector,
+                        new MediaRouter.Callback() {
+                            @Override
+                            public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo route) {
+                                super.onRouteSelected(router, route);
+                                Log.d(TAG, "onRouteSelected");
+                                // Handle the user route selection.
+                                mCastService.launchReceiver(CastDevice.getFromBundle(route.getExtras()));
+                                mCastService.watchGame(Contestant.getPlayers().get(mHomeIndex),
+                                                       Contestant.getPlayers().get(mAwayIndex));
+                                mCastService.sendMessage("Awaiting scores...");
+                            }
+
+                            @Override
+                            public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo route) {
+                                super.onRouteUnselected(router, route);
+                                Log.d(TAG, "onRouteUnselected: info=" + route);
+                                mCastService.teardown(false);
+                            }
+                        },
+                        MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                Log.d(TAG, "onServiceDisconnected");
+                mCastService = null;
+            }
+        };
+        Intent intent = new Intent(GameEmulator.this, CastScoreService.class);
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+
         // Configure Cast device discovery
         mMediaRouter = MediaRouter.getInstance(getApplicationContext());
         mMediaRouteSelector = new MediaRouteSelector.Builder()
@@ -120,72 +157,12 @@ public class GameEmulator extends AppCompatActivity {
         }
     }
 
-    private void tryBindCastService() {
-        if(mBindingInProgress) {
-            return; // Don't try to bind if a bind is pending or if already bound
-        }
-        mBindingInProgress = true;
-        mServiceConnection = new ServiceConnection() {
-                    private CastScoreService.ScoreBinder mCastService;
-
-                    @Override
-                    public void onServiceConnected(ComponentName name, IBinder service) {
-                        mBound = true;
-                        Log.d(TAG, "onServiceConnected");
-                        mCastService = (CastScoreService.ScoreBinder) service;
-                        mBindingInProgress = false;
-                        mRouteCallbacks = new MediaRouter.Callback() {
-                            @Override
-                            public void onRouteSelected(MediaRouter router, MediaRouter.RouteInfo route) {
-                                super.onRouteSelected(router, route);
-                                Log.d(TAG, "onRouteSelected");
-                                // Handle the user route selection.
-                                if( mCastService != null) {
-                                    mCastService.launchReceiver(CastDevice.getFromBundle(route.getExtras()));
-                                    mCastService.watchGame(
-                                            Contestant.getPlayers().get(mHomeIndex),
-                                            Contestant.getPlayers().get(mAwayIndex));
-                                }
-                            }
-
-                            @Override
-                            public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo route) {
-                                super.onRouteUnselected(router, route);
-                                Log.d(TAG, "onRouteUnselected: info=" + route);
-                                if(mCastService!= null) {
-                                    mCastService.teardown(false);
-                                }
-                            }
-                        };
-
-                        // Start media router discovery
-                        mMediaRouter.addCallback(
-                                mMediaRouteSelector,
-                                mRouteCallbacks,
-                                MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);
-                    }
-
-                    @Override
-                    public void onServiceDisconnected(ComponentName name) {
-                        mBound = false;
-                        mCastService = null;
-                        Log.d(TAG, "onServiceDisconnected");
-                    }
-                };
-        try {
-            Intent intent = new Intent(GameEmulator.this, CastScoreService.class);
-            bindService( intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        } catch (Exception e) {
-            Log.e(TAG, "tryBindCastService: failed to bind", e);
-            mBindingInProgress = false;
-        }
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mBound) {
+        if (mServiceConnection != null) {
             unbindService(mServiceConnection);
+            mServiceConnection = null;
         }
         mRouteCallbacks = null;
     }

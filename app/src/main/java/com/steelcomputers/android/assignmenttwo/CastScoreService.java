@@ -53,10 +53,25 @@ public class CastScoreService extends Service implements Contestant.GameListener
             CastScoreService.this.sendMessage(message);
         }
 
+        /**
+         * Launch the reciever if not running
+         * @param device the cast device to use
+         */
         public void launchReceiver(CastDevice device) {
-            Log.d(TAG, "launchReceiver");
-            mSelectedDevice = device;
-            CastScoreService.this.launchReceiver();
+            launchReceiver(device, false);
+        }
+
+        /**
+         * Launch the reciever and replace one if it exists.
+         * @param device the case device to use
+         * @param replace true to replace existing device
+         */
+        public void launchReceiver(CastDevice device, boolean replace) {
+            if (mSelectedDevice == null || replace) {
+                Log.d(TAG, "launchReceiver");
+                mSelectedDevice = device;
+                CastScoreService.this.launchReceiver();
+            }
         }
 
         public void teardown(boolean selectDefaultRoute) {
