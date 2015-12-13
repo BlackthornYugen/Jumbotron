@@ -2,7 +2,6 @@ package com.steelcomputers.android.assignmenttwo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -60,6 +59,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     public void addPoint(Contestant other)
     {
         setPoints(getPoints(other) + 1, other);
+        notifyListeners(this, other);
         doSave();
     }
 
@@ -120,9 +120,9 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         public static final String TIES   = "ties";
     }
 
-    private static List<Contestant> mContestants = new ArrayList<Contestant>();
-    private static List<PlayerListener> mListeners = new ArrayList<PlayerListener>();
-    private static Dictionary<GameListener, String> mGameListeners = new Hashtable<>();
+    private static List<Contestant> mContestants = new ArrayList<>();
+    private static List<PlayerListener> mListeners = new ArrayList<>();
+    private static Dictionary<String, List<GameListener>> mGameListeners = new Hashtable<>();
     private static boolean mIsQueryRunning         = false;
     private String mID;
 
@@ -133,24 +133,58 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         }
         return mContestants;
     }
+
     public static void addListener(PlayerListener listener) {
         if (mListeners == null) {
             mListeners = new LinkedList<PlayerListener>();
         }
         mListeners.add(listener);
     }
+
     public static void removeListener(PlayerListener listener) {
-        if (mListeners == null) {
-            mListeners = new LinkedList<PlayerListener>();
+        if (mListeners != null) {
+            mListeners.remove(listener);
         }
-        mListeners.remove(listener);
     }
-    public static void addGameListener(GameListener listener, String opponent) {
-        mGameListeners.put(listener, opponent);
+
+    /**
+     * Listen to point changes in a game
+     * @param listener The listener for the game
+     * @param home The home team/player
+     * @param away The away team/player
+     */
+    public static void addListener(GameListener listener, Contestant home, Contestant away) {
+        String gameKey = home.getName() + away.getName();
+        if (mGameListeners == null) {
+            mGameListeners = new Hashtable<>();
+        }
+        List<GameListener> listenersForOpponent = mGameListeners.get(gameKey);
+        if (listenersForOpponent == null) {
+            listenersForOpponent = new LinkedList<>();
+            mGameListeners.put(gameKey, listenersForOpponent);
+        }
+        listenersForOpponent.add(listener);
     }
-    public static void removeListener(GameListener listener) {
-        mGameListeners.remove(listener);
+
+    /**
+     * Remove listener for a game
+     * @param listener The listener to remove
+     * @param home The name of the home team/player
+     * @param away The name of the away team/player
+     */
+    public static void removeListener(GameListener listener, Contestant home, Contestant away) {
+        String gameKey = home.getName() + away.getName();
+        if (mGameListeners != null) {
+            List<GameListener> listenersForOpponent = mGameListeners.get(gameKey);
+            if (listenersForOpponent !=  null) {
+                listenersForOpponent.remove(listener);
+            }
+            if (listenersForOpponent.isEmpty()) {
+                mGameListeners.remove(gameKey);
+            }
+        }
     }
+
     public static void setPlayers(List<Contestant> contestants) {
         try {
             mContestants = contestants;
@@ -179,7 +213,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     public void setPoints(int points, Contestant other) {
         put(COLUMN.POINTS + "_" + other.getName(), points);
     }
-    
+
     public static boolean isRunningAQuery() {
         return mIsQueryRunning;
     }
@@ -280,12 +314,26 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         }
     }
 
+    private static void notifyListeners(Contestant home, Contestant away) {
+        List<GameListener> gameListeners = mGameListeners.get(home.getName() + away.getName());
+        if(gameListeners != null) {
+            for (GameListener listener:
+                    gameListeners) {
+                try {
+                    listener.score(home.getPoints(away), away.getPoints(home));
+                } catch (Exception e) {
+                    Log.e("Contestant", "Failed to update score on: " + listener, e);
+                }
+            }
+        }
+    }
+
     public interface PlayerListener {
         void notifyChange(List<Contestant> contestants);
     }
 
     public interface GameListener {
-        void score(int player, int opponent);
+        void score(int homeScore, int awayScore);
     }
 
     public static class ListAdapter extends ArrayAdapter<Contestant>

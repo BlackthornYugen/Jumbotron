@@ -18,7 +18,7 @@ import com.google.android.gms.common.api.Status;
 
 import java.io.IOException;
 
-public class CastScoreService extends Service {
+public class CastScoreService extends Service implements Contestant.GameListener {
     private static final String TAG = CastScoreService.class.getSimpleName();
 
     private static final int REQUEST_CODE = 1;
@@ -40,6 +40,11 @@ public class CastScoreService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return new ScoreBinder();
+    }
+
+    @Override
+    public void score(int homeScore, int awayScore) {
+        sendMessage(String.format("%d to %d", homeScore, awayScore));
     }
 
     public class ScoreBinder extends Binder {
