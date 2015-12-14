@@ -6,7 +6,6 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.cast.ApplicationMetadata;
 import com.google.android.gms.cast.Cast;
@@ -17,17 +16,18 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 import java.io.IOException;
+import java.util.Objects;
 
+/**
+ * This service handles communications between the app and a cast device. It was
+ * sourced from github.com/BlackthornYugen/CastHelloText-android, a fork of
+ * googlecast/CastHelloText-android
+ */
 public class CastScoreService extends Service implements Contestant.GameListener {
     private static final String TAG = CastScoreService.class.getSimpleName();
 
-    private static final int REQUEST_CODE = 1;
-
     private CastDevice mSelectedDevice;
     private GoogleApiClient mApiClient;
-    private Cast.Listener mCastListener;
-    private ConnectionCallbacks mConnectionCallbacks;
-    private ConnectionFailedListener mConnectionFailedListener;
     private HelloWorldChannel mHelloWorldChannel;
     private boolean mApplicationStarted;
     private boolean mWaitingForReconnect;
@@ -44,20 +44,15 @@ public class CastScoreService extends Service implements Contestant.GameListener
         return new ScoreBinder();
     }
 
-    @Override
-    public void score(int homeScore, int awayScore) {
-        sendMessage(String.format("%d to %d", homeScore, awayScore));
-    }
-
     /**
      * Set the score of a player
-     * @param id the player id
+     * @param name the player's name
      * @param score the player's score
      */
     @Override
-    public void score(String id, int score) {
+    public void score(String name, int score) {
         String playerName;
-        boolean isHomePlayer = mHome.getId() == id;
+        boolean isHomePlayer = Objects.equals(mHome.getName(), name);
         int playerIndex = isHomePlayer ? 1 : 2;
         if (isHomePlayer) {
             playerName = mHome.getName(true);
@@ -79,7 +74,7 @@ public class CastScoreService extends Service implements Contestant.GameListener
         }
 
         /**
-         * Launch the reciever if not running
+         * Launch the receiver if not running
          * @param device the cast device to use
          */
         public void launchReceiver(CastDevice device) {
@@ -87,7 +82,7 @@ public class CastScoreService extends Service implements Contestant.GameListener
         }
 
         /**
-         * Launch the reciever and replace one if it exists.
+         * Launch the receiver and replace one if it exists.
          * @param device the case device to use
          * @param replace true to replace existing device
          */
@@ -99,9 +94,11 @@ public class CastScoreService extends Service implements Contestant.GameListener
             }
         }
 
-        public void teardown(boolean selectDefaultRoute) {
-            Log.d(TAG, String.format("teardown with param %s", selectDefaultRoute));
-            CastScoreService.this.teardown(selectDefaultRoute);
+        /**
+         * Shutdown link to chromecast
+         */
+        public void teardown() {
+            CastScoreService.this.teardown();
         }
 
         public void watchGame(Contestant home, Contestant away) {
@@ -120,11 +117,10 @@ public class CastScoreService extends Service implements Contestant.GameListener
         }
     }
 
-    // Much of the code below was borrowed //
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
-        teardown(true);
+        teardown();
         super.onDestroy();
     }
 
@@ -133,18 +129,18 @@ public class CastScoreService extends Service implements Contestant.GameListener
      */
     void launchReceiver() {
         try {
-            mCastListener = new Cast.Listener() {
+            Cast.Listener mCastListener = new Cast.Listener() {
 
                 @Override
                 public void onApplicationDisconnected(int errorCode) {
                     Log.d(TAG, "application has stopped");
-                    teardown(true);
+                    teardown();
                 }
 
             };
             // Connect to Google Play services
-            mConnectionCallbacks = new ConnectionCallbacks();
-            mConnectionFailedListener = new ConnectionFailedListener();
+            ConnectionCallbacks mConnectionCallbacks = new ConnectionCallbacks();
+            ConnectionFailedListener mConnectionFailedListener = new ConnectionFailedListener();
             Cast.CastOptions.Builder apiOptionsBuilder = Cast.CastOptions
                     .builder(mSelectedDevice, mCastListener);
             mApiClient = new GoogleApiClient.Builder(this)
@@ -183,7 +179,7 @@ public class CastScoreService extends Service implements Contestant.GameListener
                     if ((connectionHint != null)
                             && connectionHint.getBoolean(Cast.EXTRA_APP_NO_LONGER_RUNNING)) {
                         Log.d(TAG, "App  is no longer running");
-                        teardown(true);
+                        teardown();
                     } else {
                         // Re-create the custom message channel
                         try {
@@ -243,7 +239,7 @@ public class CastScoreService extends Service implements Contestant.GameListener
                                                 mAway.notifyGameListeners(mHome);
                                             } else {
                                                 Log.e(TAG, "application could not launch");
-                                                teardown(true);
+                                                teardown();
                                             }
                                         }
                                     });
@@ -270,14 +266,14 @@ public class CastScoreService extends Service implements Contestant.GameListener
         public void onConnectionFailed(ConnectionResult result) {
             Log.e(TAG, "onConnectionFailed ");
 
-            teardown(false);
+            teardown();
         }
     }
 
     /**
      * Tear down the connection to the receiver
      */
-    private void teardown(boolean selectDefaultRoute) {
+    private void teardown() {
         Log.d(TAG, "teardown");
         if (mApiClient != null) {
             if (mApplicationStarted) {
@@ -306,6 +302,7 @@ public class CastScoreService extends Service implements Contestant.GameListener
 
     /**
      * Send a text message to the receiver
+     * @param message The raw message body to send to te cast device
      */
     private void sendMessage(String message) {
         if (mApiClient != null && mHelloWorldChannel != null) {
@@ -323,8 +320,6 @@ public class CastScoreService extends Service implements Contestant.GameListener
             } catch (Exception e) {
                 Log.e(TAG, "Exception while sending message", e);
             }
-        } else {
-            Toast.makeText(CastScoreService.this, message, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -340,8 +335,11 @@ public class CastScoreService extends Service implements Contestant.GameListener
             return getString(R.string.namespace);
         }
 
-        /*
+        /**
          * Receive message from the receiver app
+         * @param castDevice The cast device the message was recived from
+         * @param namespace The namespace used to transmit the message
+         * @param message The message body
          */
         @Override
         public void onMessageReceived(CastDevice castDevice, String namespace,
