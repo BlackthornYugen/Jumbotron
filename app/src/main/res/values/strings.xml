@@ -58,6 +58,7 @@ Created by John Steel on 2015-10-31.
     <string name="select_an_opponent">Select an opponent</string>
     <string name="new_name_invalid">The selected new name was invalid or used</string>
     <string name="all_players_deleted">All players were deleted</string>
+    <string name="new_contestant">New Contestant</string>
 
     <!-- Cast Related -->
     <string name="app_id">EA80F3A2</string>
