@@ -184,9 +184,9 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             List<GameListener> listenersForOpponent = mGameListeners.get(gameKey);
             if (listenersForOpponent !=  null) {
                 listenersForOpponent.remove(listener);
-            }
-            if (listenersForOpponent.isEmpty()) {
-                mGameListeners.remove(gameKey);
+                if (listenersForOpponent.isEmpty()) {
+                    mGameListeners.remove(gameKey);
+                }
             }
         }
     }
