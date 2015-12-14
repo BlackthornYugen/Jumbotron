@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 /**
+ * Preferences.java
+ *
  * Created by John Steel on 2015-11-01.
  */
 public class Preferences {

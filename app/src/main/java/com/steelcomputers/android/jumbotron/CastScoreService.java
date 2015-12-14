@@ -19,6 +19,11 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
+ * CastScoreService.java
+ *
+ * Manny Lopez &
+ * John Steel
+ *
  * This service handles communications between the app and a cast device. It was
  * sourced from github.com/BlackthornYugen/CastHelloText-android, a fork of
  * googlecast/CastHelloText-android
