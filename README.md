@@ -1,4 +1,4 @@
-Jumbotron
+![Jumbotron Logo](https://cloud.githubusercontent.com/assets/3138467/11771083/7c0e4b86-a1d9-11e5-9719-7c68c665395a.png)
 --------------------------------
 
 Jumbotron is (will be) a tool for tracking and displaying the scores of a game. Once
