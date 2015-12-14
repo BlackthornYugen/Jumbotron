@@ -548,6 +548,12 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
+
+                //if is adding and was canceled by user deleted
+                if (positive.contains(context.getResources().getString(R.string.add)))
+                {
+                    contestant.doDelete();
+                }
             }
         });
     }
