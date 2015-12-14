@@ -68,7 +68,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
      */
     public void minusPoint(Contestant other)
     {
-        setPoints(getPoints(other) - 1, other);
+        setPoints(Math.max(getPoints(other) - 1, 0), other);
         notifyListeners(this, other);
         doSave();
     }
@@ -184,9 +184,9 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             List<GameListener> listenersForOpponent = mGameListeners.get(gameKey);
             if (listenersForOpponent !=  null) {
                 listenersForOpponent.remove(listener);
-            }
-            if (listenersForOpponent.isEmpty()) {
-                mGameListeners.remove(gameKey);
+                if (listenersForOpponent.isEmpty()) {
+                    mGameListeners.remove(gameKey);
+                }
             }
         }
     }
@@ -344,7 +344,7 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             for (GameListener listener:
                     gameListeners) {
                 try {
-                    listener.score(c1.getId(), c1.getPoints(c2));
+                    listener.score(c1.getName(), c1.getPoints(c2));
                 } catch (Exception e) {
                     Log.e("Contestant", "Failed to update score on: " + listener, e);
                 }
@@ -357,7 +357,6 @@ public class Contestant extends ParseObject implements java.io.Serializable {
     }
 
     public interface GameListener {
-        void score(int homeScore, int awayScore);
         void score(String id, int score);
     }
 

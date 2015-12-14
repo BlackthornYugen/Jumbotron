@@ -97,7 +97,7 @@ public class GameEmulator extends AppCompatActivity {
                             public void onRouteUnselected(MediaRouter router, MediaRouter.RouteInfo route) {
                                 super.onRouteUnselected(router, route);
                                 Log.d(TAG, "onRouteUnselected: info=" + route);
-                                mCastService.teardown(false);
+                                mCastService.teardown();
                             }
                         },
                         MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);

@@ -9,14 +9,33 @@
 			flex: 1;
 		}
 
-		.score { font-size: 5em; font-weight: 800 }
+        .logo {
+            position: absolute;
+            z-index: 333;
+            opacity: 0.5;
+            right: 60px;
+            bottom: 65px;
+            width: 15%;
+        }
 
-		.player1, .player2 {color: red; text-align: center; }
-		.player2 {color: blue;}
+		.score { font-size: 18em; font-weight: 800 }
+
+		div h1 {
+			font-size: 6em;
+			padding: 15px 0;
+            border-radius: 50px;
+			background: #787878;
+			border: 10px dashed #282828;
+		}
+
+		.player1, .player2 {color: #ff3333; text-align: center; }
+		.player2 {color: #3333ff;}
 
 
 		html, body {
 			height: 100%;
+			border: 30px #787878 dashed;
+			background-color: #282828;
 		}
 
 		.Aligner {
@@ -29,6 +48,7 @@
     <title>Jumbotron</title>
   </head>
   <body>
+    <img src="Jumbotron.png" class="logo" />
 	<div class="Aligner">
 	  <div class="container-fluid">
 		  <div class="row">
