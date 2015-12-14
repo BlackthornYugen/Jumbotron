@@ -3,12 +3,14 @@ package com.steelcomputers.android.assignmenttwo;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.media.MediaRouter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.steelcomputers.android.assignmenttwo.CastScoreService.ScoreBinder;
 
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class GameEmulatorFragment extends Fragment implements Contestant.PlayerL
 
     private Button mBtnResetGame;
     private Button mBtnStartFromScratch;
+    private ScoreBinder mCastService;
 
     private TextView[] mTxtName;
     private TextView[] mTxtPoints;

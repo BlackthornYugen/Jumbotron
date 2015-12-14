@@ -59,4 +59,8 @@ Created by John Steel on 2015-10-31.
     <string name="new_name_invalid">The selected new name was invalid or used</string>
     <string name="all_players_deleted">All players were deleted</string>
 
+    <!-- Cast Related -->
+    <string name="app_id">EA80F3A2</string>
+    <string name="namespace">urn:x-cast:com.steelcomputers.cast.jumbotron</string>
+    <string name="cast_to_device">Cast to Device</string>
 </resources>

@@ -127,7 +127,7 @@ public class PlayerDetailFragment extends Fragment implements Contestant.PlayerL
             if (mContestant != null) {
                 if (Contestant.getPlayers().contains(mContestant)) {
                     if (mAppBar != null) {
-                        mAppBar.setTitle(mContestant.getName());
+                        mAppBar.setTitle(mContestant.getName(true));
                     }
 
                     mWins.setText(Integer.toString(mContestant.getWins()));
