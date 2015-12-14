@@ -241,15 +241,20 @@ public class Contestant extends ParseObject implements java.io.Serializable {
      * @param withIdentIcon true to prefix with badge icon
      * @return string name with optional badge
      */
-    public String getName(boolean withIdentIcon) {
-        if (withIdentIcon) {
+    public String getName(boolean withIdentIcon)
+    {
+        if (withIdentIcon)
+        {
             return (isATeam() ? "\uD83D\uDC65 " : "\uD83D\uDC64 ") + getName();
         }
         return getName();
     }
-    public String getName() {
-        return getString(COLUMN.NAME);
+
+    public String getName()
+    {
+        return getString(COLUMN.NAME) == null ? "" : getString(COLUMN.NAME);
     }
+
     public void setName(String name) {
         put(COLUMN.NAME, name);
     }
@@ -547,6 +552,21 @@ public class Contestant extends ParseObject implements java.io.Serializable {
         builder.setNegativeButton(negative, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+
+                //if is adding and was canceled by user deleted
+                if (positive.contains(context.getResources().getString(R.string.add)))
+                {
+                    contestant.doDelete();
+                }
+            }
+        });
+
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener()
+        {
+            @Override
+            public void onCancel(DialogInterface dialog)
+            {
                 dialog.cancel();
 
                 //if is adding and was canceled by user deleted
