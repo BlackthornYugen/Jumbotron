@@ -1,4 +1,4 @@
-package com.steelcomputers.android.assignmenttwo;
+package com.steelcomputers.android.jumbotron;
 
 
 import android.annotation.TargetApi;

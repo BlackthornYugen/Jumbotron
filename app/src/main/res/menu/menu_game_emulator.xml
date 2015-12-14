@@ -8,7 +8,7 @@ Created by John Steel on 2015-11-02 from a template.
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.steelcomputers.android.assignmenttwo.GameEmulator">
+    tools:context="com.steelcomputers.android.jumbotron.GameEmulator">
     <item android:id="@+id/action_refresh" android:title="@string/refresh"
         android:icon="@android:drawable/ic_menu_recent_history"
         android:orderInCategory="0" app:showAsAction="ifRoom|withText" />
