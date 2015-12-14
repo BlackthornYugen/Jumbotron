@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.steelcomputers.android.assignmenttwo" >
+    package="com.steelcomputers.android.jumbotron" >
 
     <meta-data
         android:name="com.parse.APP_ID"
@@ -13,14 +13,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".App"
+        android:name="com.steelcomputers.android.jumbotron.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".PlayerListActivity"
+            android:name="com.steelcomputers.android.jumbotron.PlayerListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
@@ -30,25 +30,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PlayerDetailActivity"
+            android:name="com.steelcomputers.android.jumbotron.PlayerDetailActivity"
             android:label="@string/title_player_detail"
-            android:parentActivityName=".PlayerListActivity"
+            android:parentActivityName="com.steelcomputers.android.jumbotron.PlayerListActivity"
             android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".PlayerListActivity" />
+                android:value="com.steelcomputers.android.jumbotron.PlayerListActivity" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.steelcomputers.android.jumbotron.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
         <activity
-            android:name=".GameEmulator"
+            android:name="com.steelcomputers.android.jumbotron.GameEmulator"
             android:label="@string/title_activity_game_emulator"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <service
-            android:name=".CastScoreService"
+            android:name="com.steelcomputers.android.jumbotron.CastScoreService"
             android:enabled="true"
             android:exported="false"></service>
     </application>

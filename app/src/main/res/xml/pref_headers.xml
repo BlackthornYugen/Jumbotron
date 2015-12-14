@@ -10,7 +10,7 @@ Created by John Steel on 2015-11-01 from a template.
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.steelcomputers.android.assignmenttwo.SettingsActivity$DataSyncPreferenceFragment"
+        android:fragment="com.steelcomputers.android.jumbotron.SettingsActivity$DataSyncPreferenceFragment"
         android:title="@string/pref_header_data_sync" android:icon="@drawable/ic_sync_black_24dp" />
 
 </preference-headers>

@@ -1,4 +1,4 @@
-package com.steelcomputers.android.assignmenttwo;
+package com.steelcomputers.android.jumbotron;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -561,16 +561,13 @@ public class Contestant extends ParseObject implements java.io.Serializable {
             }
         });
 
-        builder.setOnCancelListener(new DialogInterface.OnCancelListener()
-        {
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
-            public void onCancel(DialogInterface dialog)
-            {
+            public void onCancel(DialogInterface dialog) {
                 dialog.cancel();
 
                 //if is adding and was canceled by user deleted
-                if (positive.contains(context.getResources().getString(R.string.add)))
-                {
+                if (positive.contains(context.getResources().getString(R.string.add))) {
                     contestant.doDelete();
                 }
             }
